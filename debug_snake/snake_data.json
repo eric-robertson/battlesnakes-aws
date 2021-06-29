@@ -1,0 +1,10 @@
+{
+    "hello_response" : {
+        "apiversion": "1",
+        "author": "MyUsername",
+        "color" : "#888888",
+        "head" : "default",
+        "tail" : "default",
+        "version" : "0.0.1-beta"
+    }
+}
