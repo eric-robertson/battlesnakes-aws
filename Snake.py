@@ -1,16 +1,18 @@
 import numpy as np
 
+import GamePackager
+import GamePredictor
+import ScoreBoard
+
 # Actual logic for the Battlesnake
 
 def start ( request_data ):
-    print( request_data )
-    return "left"
+    return ""
 
 def move ( request_data):
-    return "left"
+    
+    game_board = GamePackager.parse_board( request_data )
+    health, food, futures = GamePredictor.get_next_states( game_board )
+    best_move = ScoreBoard.generate_board_scores( health, food, futures )
 
-
-# Utils
-
-def generate_board_constuct ( game_state ):
-    pass
+    return ({"L" : "left", "R" : 'right', "U" : 'up', "D" : "down"})[best_move]

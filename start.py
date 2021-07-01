@@ -29,7 +29,7 @@ def hello():
 def start ():
 
     # Get request body
-    data = request.json
+    data = request.get_json()
 
     # Trigger handler
     start_response = Snake.start( data )
@@ -42,7 +42,7 @@ def start ():
 def move ():
 
     # Get request body
-    data = request.json
+    data = request.get_json()
 
     # Trigger handler
     move_response = Snake.move( data )
