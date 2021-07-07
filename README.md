@@ -1,5 +1,4 @@
-# DEBUG SNAKE
+# Robeworm
 
-Snake for battlesnakes that is ment to debug my local implementation
+Robert Hammond
 
-Simply exists

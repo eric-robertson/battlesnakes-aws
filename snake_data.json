@@ -1,10 +1,13 @@
 {
     "hello_response" : {
         "apiversion": "1",
-        "author": "MyUsername",
-        "color" : "#888888",
+        "author": "hmmoro",
+        "name": "Robeworm",
+        "color" : "#777777",
+        "secondary_color" : "f5a422",
         "head" : "default",
         "tail" : "default",
-        "version" : "0.0.1-beta"
+        "version" : "0.0.1-beta",
+        "taunt" : "bpo"
     }
 }
