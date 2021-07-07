@@ -12,4 +12,4 @@ Todo:
 - Do the whole tree search thing ( currently doesnt )
 - Write a better score function ( uses health right now which sucks )
 - Cache the board states, would be a major speed-up
-- Add cuttoff to guerentee responce within time limit
+- Add cuttoff to guarantee response within time limit

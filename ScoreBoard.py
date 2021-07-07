@@ -1,4 +1,4 @@
-# Takes in a collection of game baord options and scores each result for computations
+# Takes in a collection of game board options and scores each result for computations
 
 import numpy as np
 
