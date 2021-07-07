@@ -21,8 +21,8 @@ class BattlesnakeServer(object):
         return {
             "apiversion": "1",
             "author": "hmmoro",
-            "color": "#777777",
-            "secondary_color": "f5a422",
+            "color": "#f5a422",
+            "secondary_color": "777777",
             "head": "default",
             "tail": "default",
         }

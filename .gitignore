@@ -1,1 +1,7 @@
 snake
+poetry.lock
+*.DS_Store
+*.pyc
+.cmd
+.idea
+.vscode

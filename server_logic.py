@@ -1,5 +1,6 @@
 import random
 from typing import List, Dict
+import numpy as np
 
 """
 This file can be a nice home for your move logic, and to write helper functions.
@@ -55,23 +56,52 @@ def choose_move(data: dict) -> str:
     # print(f"My Battlesnakes head this turn is: {my_head}")
     # print(f"My Battlesnakes body this turn is: {my_body}")
 
-    possible_moves = ["up", "down", "left", "right"]
+    possible_moves = set(["up", "down", "left", "right"])
 
     # Don't allow your Battlesnake to move back in on it's own neck
     possible_moves = avoid_my_neck(my_head, my_body, possible_moves)
 
-    # TODO: Using information from 'data', find the edges of the board and don't let your Battlesnake move beyond them
-    # board_height = ?
-    # board_width = ?
-
-    # TODO Using information from 'data', don't let your Battlesnake pick a move that would hit its own body
+    # find the edges of the board and don't let your Battlesnake move beyond them
+    board_height = data['board']['height']
+    board_width = data['board']['height']
+    my_head = [my_head['x'], my_head['y']]
+    print(my_head)
+    if my_head[0] == board_width - 1:
+        possible_moves.remove("right")
+    if my_head[0] == 0:
+        possible_moves.remove("left")
+    if my_head[1] == board_height - 1:
+        possible_moves.remove("up")
+    if my_head[1] == 0:
+        possible_moves.remove("down")
+    
+    # matrix representation of the board
+    # TODO: edges of each square representation. This way the direction of the snakes are represented
+    board = np.zeros((board_height, board_width)) # zero indicates open space
+    for d in my_body[:-1]: # exclude the very end (tail), this will move out of the way the next turn
+        board[d['x']][d['y']] = -1 # -1 indicates (my) snake body
+    print(board)
+    print(data['board']['snakes'].keys())
+  
+    # don't let your Battlesnake pick a move that would hit its own body
+    if 'up' in possible_moves and board[my_head[0]][my_head[1] + 1] < 0:
+        possible_moves.remove('up')
+    if 'down' in possible_moves and board[my_head[0]][my_head[1] - 1] < 0:
+        possible_moves.remove('down')
+    if 'left' in possible_moves and board[my_head[0] - 1][my_head[1]] < 0:
+        possible_moves.remove('left')
+    if 'right' in possible_moves and board[my_head[0] + 1][my_head[1]] < 0:
+        possible_moves.remove('right')
+    # my_body = [[d['x'], d['y']] for d in my_body]
 
     # TODO: Using information from 'data', don't let your Battlesnake pick a move that would collide with another Battlesnake
 
     # TODO: Using information from 'data', make your Battlesnake move towards a piece of food on the board
 
     # Choose a random direction from the remaining possible_moves to move in, and then return that move
-    move = random.choice(possible_moves)
+    move = "left"
+    if possible_moves:
+        move = random.choice(list(possible_moves))
 
     print(f"CHOOSING MOVE: {move} from all valid options in {possible_moves}")
     
