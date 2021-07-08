@@ -2,14 +2,6 @@ import random
 from typing import List, Dict
 import numpy as np
 
-"""
-This file can be a nice home for your move logic, and to write helper functions.
-
-We have started this for you, with a function to help remove the 'neck' direction
-from the list of possible moves!
-"""
-
-
 def avoid_neck(my_head: Dict[str, int], my_body: List[dict], possible_moves: List[str]) -> List[str]:
     my_neck = cvt_pt(my_body[1])  # The segment of body right after the head is the 'neck'
     if my_neck[0] < my_head[0]:  # my neck is left of my head
@@ -37,7 +29,7 @@ def avoid_walls(height: int, width: int, head, possible_moves):
 def avoid_snakes(possible_moves: dict, board) -> dict:
     # don't let your Battlesnake pick a move that would hit its own body
     for move, pos in possible_moves.items():
-        if pos != -1 and board[pos[0]][pos[1]] < 0:
+        if pos != -1 and board[pos[0]][pos[1]] > 0:
             possible_moves[move] = -1
     return possible_moves
 
@@ -48,7 +40,7 @@ def avoid_head_on(possible_moves, data, my_head):
             if pos != -1:
                 for snake in data['board']['snakes']:
                     s_head = cvt_pt(snake['head'])
-                    if mh_dist(s_head, my_head) != 0 and mh_dist(s_head, pos) == 1:
+                    if len(snake['body']) > len(data['you']['body']) and mh_dist(s_head, pos) == 1:
                         possible_moves[move] = -1
                         n -= 1
                         if n <= 1:
@@ -57,15 +49,7 @@ def avoid_head_on(possible_moves, data, my_head):
 
 def choose_move(data: dict) -> str:
     """
-    data: Dictionary of all Game Board data as received from the Battlesnake Engine.
-    For a full example of 'data', see https://docs.battlesnake.com/references/api/sample-move-request
-
-    return: A String, the single move to make. One of "up", "down", "left" or "right".
-
-    Use the information in 'data' to decide your next move. The 'data' variable can be interacted
-    with as a Python Dictionary, and contains all of the information about the Battlesnake board 
-    for each move of the game.
-
+    example of 'data' https://docs.battlesnake.com/references/api/sample-move-request
     """
     my_head = cvt_pt(data["you"]["head"])
     my_body = data["you"]["body"]
@@ -86,13 +70,16 @@ def choose_move(data: dict) -> str:
     possible_moves = avoid_walls(board_height, board_width, my_head, possible_moves)
     
     # matrix representation of the board
-    # TODO: edges of each square representation. This way the direction of the snakes are represented
     board = np.zeros((board_height, board_width)) # zero indicates open space
-    for d in my_body[:-1]: # exclude the very end (tail), this will move out of the way the next turn
-        board[d['x']][d['y']] = -1 # -1 indicates snake body
+    i = len(my_body)
+    for d in my_body[:-1]:
+        board[d['x']][d['y']] = i
+        i -= 1
     for snake in data['board']['snakes']:
+        i = len(snake['body'])
         for d in snake['body'][:-1]:
-            board[d['x']][d['y']] = -1 # -1 indicates snake body
+            board[d['x']][d['y']] = i
+            i -= 1
    
     # avoid other snakes yes
     possible_moves = avoid_snakes(possible_moves, board)
@@ -100,8 +87,7 @@ def choose_move(data: dict) -> str:
     # try to avoid head-on collisions if possible
     possible_moves = avoid_head_on(possible_moves, data, my_head)
 
-    
-    # Choose a random direction from the remaining possible_moves to move in, and then return that move
+    # TODO: try to avoid closing itself off
     rem = remaining_moves(possible_moves)
     move = "left"
     if len(rem) > 0:
@@ -110,7 +96,6 @@ def choose_move(data: dict) -> str:
     print(f"CHOOSING MOVE: {move} from all valid options in {rem}")
     
     return move
-
 
 def next_pos(pos, move):
     if move == 'up':
