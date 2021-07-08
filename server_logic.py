@@ -10,19 +10,8 @@ from the list of possible moves!
 """
 
 
-def avoid_my_neck(my_head: Dict[str, int], my_body: List[dict], possible_moves: List[str]) -> List[str]:
-    """
-    my_head: Dictionary of x/y coordinates of the Battlesnake head.
-            e.g. {"x": 0, "y": 0}
-    my_body: List of dictionaries of x/y coordinates for every segment of a Battlesnake.
-            e.g. [ {"x": 0, "y": 0}, {"x": 1, "y": 0}, {"x": 2, "y": 0} ]
-    possible_moves: List of strings. Moves to pick from.
-            e.g. ["up", "down", "left", "right"]
-
-    return: The list of remaining possible_moves, with the 'neck' direction removed
-    """
+def avoid_neck(my_head: Dict[str, int], my_body: List[dict], possible_moves: List[str]) -> List[str]:
     my_neck = cvt_pt(my_body[1])  # The segment of body right after the head is the 'neck'
-
     if my_neck[0] < my_head[0]:  # my neck is left of my head
         possible_moves['left'] = -1
     elif my_neck[0] > my_head[0]:  # my neck is right of my head
@@ -34,6 +23,37 @@ def avoid_my_neck(my_head: Dict[str, int], my_body: List[dict], possible_moves: 
 
     return possible_moves
 
+def avoid_walls(height: int, width: int, head, possible_moves):
+    if head[0] == width - 1:
+        possible_moves['right'] = -1
+    if head[0] == 0:
+        possible_moves['left'] = -1
+    if head[1] == height - 1:
+        possible_moves['up'] = -1
+    if head[1] == 0:
+        possible_moves['down'] = -1
+    return possible_moves
+
+def avoid_snakes(possible_moves: dict, board) -> dict:
+    # don't let your Battlesnake pick a move that would hit its own body
+    for move, pos in possible_moves.items():
+        if pos != -1 and board[pos[0]][pos[1]] < 0:
+            possible_moves[move] = -1
+    return possible_moves
+
+def avoid_head_on(possible_moves, data, my_head):
+    n = len(remaining_moves(possible_moves))
+    if n > 1:
+        for move, pos in possible_moves.items():
+            if pos != -1:
+                for snake in data['board']['snakes']:
+                    s_head = cvt_pt(snake['head'])
+                    if mh_dist(s_head, my_head) != 0 and mh_dist(s_head, pos) == 1:
+                        possible_moves[move] = -1
+                        n -= 1
+                        if n <= 1:
+                            break
+    return possible_moves
 
 def choose_move(data: dict) -> str:
     """
@@ -47,8 +67,8 @@ def choose_move(data: dict) -> str:
     for each move of the game.
 
     """
-    my_head = cvt_pt(data["you"]["head"])  # A dictionary of x/y coordinates like {"x": 0, "y": 0}
-    my_body = data["you"]["body"]  # A list of x/y coordinate dictionaries like [ {"x": 0, "y": 0}, {"x": 1, "y": 0}, {"x": 2, "y": 0} ]
+    my_head = cvt_pt(data["you"]["head"])
+    my_body = data["you"]["body"]
 
     possible_moves = {
       "up"    : next_pos(my_head, "up"),
@@ -56,21 +76,14 @@ def choose_move(data: dict) -> str:
       "left"  : next_pos(my_head, "left"),
       "right" : next_pos(my_head, "right")
     }
-    # Don't allow your Battlesnake to move back in on it's own neck
-    possible_moves = avoid_my_neck(my_head, my_body, possible_moves)
 
-    # find the edges of the board and don't let your Battlesnake move beyond them
+    # avoid neck
+    possible_moves = avoid_neck(my_head, my_body, possible_moves)
+
+    # avoid walls
     board_height = data['board']['height']
     board_width = data['board']['height']
-
-    if my_head[0] == board_width - 1:
-        possible_moves['right'] = -1
-    if my_head[0] == 0:
-        possible_moves['left'] = -1
-    if my_head[1] == board_height - 1:
-        possible_moves['up'] = -1
-    if my_head[1] == 0:
-        possible_moves['down'] = -1
+    possible_moves = avoid_walls(board_height, board_width, my_head, possible_moves)
     
     # matrix representation of the board
     # TODO: edges of each square representation. This way the direction of the snakes are represented
@@ -80,31 +93,14 @@ def choose_move(data: dict) -> str:
     for snake in data['board']['snakes']:
         for d in snake['body'][:-1]:
             board[d['x']][d['y']] = -1 # -1 indicates snake body
-        
-    # don't let your Battlesnake pick a move that would hit its own body
-    for move, pos in possible_moves.items():
-        if pos != -1 and board[pos[0]][pos[1]] < 0:
-            possible_moves[move] = -1
+   
+    # avoid other snakes yes
+    possible_moves = avoid_snakes(possible_moves, board)
+
+    # try to avoid head-on collisions if possible
+    possible_moves = avoid_head_on(possible_moves, data, my_head)
+
     
-    # try to avoid head-on collisions
-    n = len(remaining_moves(possible_moves))
-    print(n)
-    if n > 1:
-        for move, pos in possible_moves.items():
-            if pos != -1:
-                for snake in data['board']['snakes']:
-                    s_head = cvt_pt(snake['head'])
-                    if mh_dist(s_head, my_head) != 0 and mh_dist(s_head, pos) == 1:
-                        possible_moves[move] = -1
-                        n -= 1
-                        if n <= 1:
-                            break
-    print(possible_moves)
-
-    # TODO: Using information from 'data', don't let your Battlesnake pick a move that would collide with another Battlesnake
-
-    # TODO: Using information from 'data', make your Battlesnake move towards a piece of food on the board
-
     # Choose a random direction from the remaining possible_moves to move in, and then return that move
     rem = remaining_moves(possible_moves)
     move = "left"
