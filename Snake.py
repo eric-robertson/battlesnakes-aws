@@ -6,7 +6,7 @@ import Oracle
 import Packager
 import time
 
-# Actual logic for the Battlesnake
+MIN_SEARCH_TIME = 450 # milliseconds
 
 def start ( request_data ):
     return ""
@@ -29,7 +29,7 @@ def move ( request_data):
         target_branch.register_childen( next_branches )
 
         now = time.time() * 1000
-        if ( now - start > 450 ): break
+        if ( now - start > MIN_SEARCH_TIME ): break
         
     # Finished, lets get our best board
     score, move = game_tree.get_prediction()

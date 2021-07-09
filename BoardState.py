@@ -2,6 +2,16 @@
 
 import numpy as np
 
+# TODO: change layer order so snakes are at higher layers
+INFO_LAYER = 2 # 0
+FOOD_LAYER = 3 # 1
+
+HEALTH_IDX = 0
+LENGTH_IDX = 1
+DEAD_IDX = 2
+
+MAX_HEALTH = 100
+
 class BoardState:
 
     def __init__ (self, data ):
@@ -13,28 +23,28 @@ class BoardState:
     def isSnakeBody ( self, snake, x, y):
         return self.data[snake,x, y] > 1
     def inBounds ( self, x, y ):
-        return (x >=0 and y >= 0 and x < 11 and y < 11)
+        return (x >= 0 and y >= 0 and x < self.board.shape[1] and y < self.board.shape[2])
     def getHealth ( self, snake ):
-        return self.data[2,snake,0]
+        return self.data[INFO_LAYER, snake, HEALTH_IDX]
     def getLength ( self, snake ):
-        return self.data[2,snake,1]
+        return self.data[INFO_LAYER, snake, LENGTH_IDX]
     def getDead ( self, snake ):
-        return self.data[2,snake,2]
+        return self.data[INFO_LAYER, snake, DEAD_IDX]
     def getLayer ( self, snake ):
         return self.data[snake]
     def getHeads ( self ):
         return np.where(self.data[:2] == 1)
     def setDead ( self, snake ):
-        self.data[2,snake,2] = 1
+        self.data[INFO_LAYER, snake, DEAD_IDX] = 1
     def eatFood ( self, snake ):
-        self.data[2,snake,0] = 100
-        self.data[2,snake,1] += 1
+        self.data[INFO_LAYER, snake, HEALTH_IDX] = MAX_HEALTH
+        self.data[INFO_LAYER, snake, LENGTH_IDX] += 1
 
     def log ( self ):
         print("Board:")
-        for j in range(10,-1,-1):
+        for j in range(self.board.shape[2]-1,-1,-1):
             row = ""
-            for i in range (11):
+            for i in range (self.board.shape[1]):
                 if self.data[0,i,j] == 1:
                     row+="A"
                 elif self.data[0,i,j] > 1:
@@ -44,7 +54,7 @@ class BoardState:
                 elif self.data[1,i,j] > 1:
                     row+= str(int(self.data[1,i,j]))
 
-                elif self.data[3,i,j] != 0:
+                elif self.data[FOOD_LAYER,i,j] != 0:
                     row += "F"
                 else:
                     row += "."
@@ -111,6 +121,6 @@ class BoardState:
         # Grab food
         for s in range(2):
             if not self.getDead( s ):
-                if self.getLayer(3)[xs[s],ys[s]]:
-                    self.data[3,xs[s],ys[s]] = 0
+                if self.getLayer(FOOD_LAYER)[xs[s],ys[s]]:
+                    self.data[FOOD_LAYER,xs[s],ys[s]] = 0
                     self.eatFood( s )
