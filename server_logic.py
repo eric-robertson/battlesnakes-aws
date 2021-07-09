@@ -34,7 +34,7 @@ def avoid_snakes(possible_moves: dict, board) -> dict:
             possible_moves[move] = -1
     return possible_moves
 
-def avoid_head_on(possible_moves, data, my_head):
+def avoid_head_on(possible_moves, data):
     n = len(remaining_moves(possible_moves))
     if n > 1:
         for move, pos in possible_moves.items():
@@ -91,7 +91,7 @@ def choose_move(data: dict) -> str:
     # avoid other snakes yes
     possible_moves = avoid_snakes(possible_moves, board)
     # try to avoid head-on collisions if possible
-    possible_moves = avoid_head_on(possible_moves, data, my_head)
+    possible_moves = avoid_head_on(possible_moves, data)
     # choose random move from remaining options if there are any
     rem = remaining_moves(possible_moves)
     move = "left"
@@ -104,9 +104,9 @@ def choose_move(data: dict) -> str:
     return move
 
 def use_tree_search(data):
-    # state, my_idx = cvt_state(data)
-    # strategy = MinMax(1)
-    # move = strategy.decide_move(state, my_idx)
+    state, my_idx = cvt_state(data)
+    strategy = MinMax(1)
+    move = strategy.decide_move(state, my_idx)
     move = ""
     if move == "":
         return choose_move(data)

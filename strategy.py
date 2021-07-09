@@ -3,7 +3,7 @@ from math import tanh
 from copy import deepcopy
 
 class MinMax:
-    max_depth = 5
+    max_depth = 2
 
     def __init__(self, max_depth: int):
         self.max_depth = max_depth
@@ -22,7 +22,7 @@ class MinMax:
             return ""
         
         return move
-    
+
     def evaluate(self, state: GameState, snake_idx: int) -> float:
         score = 0
         snake = state.get_snake(snake_idx)
@@ -60,7 +60,8 @@ class MinMax:
         return score
 
     def tree_search(self, state: GameState, snake_idx: int, move: str, a: float, b: float, depth: int, max_depth: int, max_player: bool):
-        print("depth =", depth)
+        print("depth =", depth, "/", max_depth)
+        state.board.print()
         snake = state.get_snake(snake_idx)
         # delta = 
         if depth == self.max_depth or not snake.alive:

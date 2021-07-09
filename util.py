@@ -86,8 +86,21 @@ class Board:
                 self.board[i][j].vacate_all()
 
     def print(self):
-        # print(self.board)
-        pass
+        print()
+        for row in self.board:
+            for cell in row:
+                if cell.t == EMPTY:
+                    print(".", end=" ")
+                elif cell.t == WALL:
+                    print("X", end=" ")
+                elif cell.t == FOOD:
+                    print("f", end=" ")
+                else:
+                    s_idx = list(cell.occupants)[0]
+                    print(s_idx, end=" ")
+            print()
+        print()
+        
 
     def sample_empty(self):
         x = random.choice(range(self.w)) + 1
