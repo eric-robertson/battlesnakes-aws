@@ -1,6 +1,9 @@
 import random
 from typing import List, Dict
 import numpy as np
+from AStar import *
+
+
 
 def avoid_neck(my_head: Dict[str, int], my_body: List[dict], possible_moves: List[str]) -> List[str]:
     my_neck = cvt_pt(my_body[1])  # The segment of body right after the head is the 'neck'
@@ -27,9 +30,8 @@ def avoid_walls(height: int, width: int, head, possible_moves):
     return possible_moves
 
 def avoid_snakes(possible_moves: dict, board) -> dict:
-    # don't let your Battlesnake pick a move that would hit its own body
     for move, pos in possible_moves.items():
-        if pos != -1 and board[pos[0]][pos[1]] > 0:
+        if pos != -1 and board[pos[0]][pos[1]] > 1:
             possible_moves[move] = -1
     return possible_moves
 
@@ -72,22 +74,23 @@ def choose_move(data: dict) -> str:
     # matrix representation of the board
     board = np.zeros((board_height, board_width)) # zero indicates open space
     i = len(my_body)
-    for d in my_body[:-1]:
+    for d in my_body:
         board[d['x']][d['y']] = i
         i -= 1
     for snake in data['board']['snakes']:
         i = len(snake['body'])
-        for d in snake['body'][:-1]:
+        for d in snake['body']:
             board[d['x']][d['y']] = i
             i -= 1
+    
+    for f in data['food']:
+        board[f['x']][f['y']] = -1 # -1 indicated food
    
     # avoid other snakes yes
     possible_moves = avoid_snakes(possible_moves, board)
-
     # try to avoid head-on collisions if possible
     possible_moves = avoid_head_on(possible_moves, data, my_head)
-
-    # TODO: try to avoid closing itself off
+    # TODO: try to avoid closing itself off - minimax search
     rem = remaining_moves(possible_moves)
     move = "left"
     if len(rem) > 0:
@@ -96,30 +99,3 @@ def choose_move(data: dict) -> str:
     print(f"CHOOSING MOVE: {move} from all valid options in {rem}")
     
     return move
-
-def next_pos(pos, move):
-    if move == 'up':
-        return [pos[0], pos[1] + 1]
-    elif move == 'down':
-        return [pos[0], pos[1] - 1]
-    elif move == 'left':
-        return [pos[0] - 1, pos[1]]
-    elif move == 'right':
-        return [pos[0] + 1, pos[1]]
-    else:
-        print(f"ERROR: {move} is invalid move" )
-        return -1
-
-# manhattan distance
-def mh_dist(p1, p2):
-    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
-
-def cvt_pt(dict_pt):
-    return [dict_pt['x'], dict_pt['y']]
-
-def remaining_moves(possible_moves):
-    rem = []
-    for move, pos in possible_moves.items():
-        if pos != -1:
-            rem.append(move)
-    return rem
