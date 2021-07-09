@@ -56,10 +56,10 @@ def choose_move(data: dict) -> str:
     my_body = data["you"]["body"]
 
     possible_moves = {
-      "up"    : next_pos(my_head, "up"),
-      "down"  : next_pos(my_head, "down"),
-      "left"  : next_pos(my_head, "left"),
-      "right" : next_pos(my_head, "right")
+      "up"    : my_head.move("up"),
+      "down"  : my_head.move("down"),
+      "left"  : my_head.move("left"),
+      "right" : my_head.move("right")
     }
 
     # avoid neck
@@ -101,11 +101,10 @@ def choose_move(data: dict) -> str:
     return move
 
 def use_tree_search(data):
-    state, my_idx = cvt_state(data)
-
-    strategy = MinMax(1)
-    move = strategy.decide_move(state, my_idx)
-
+    # state, my_idx = cvt_state(data)
+    # strategy = MinMax(1)
+    # move = strategy.decide_move(state, my_idx)
+    move = ""
     if move == "":
         return choose_move(data)
     else:
