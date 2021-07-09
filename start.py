@@ -3,18 +3,24 @@ Generic starter code for battlesnakes
 '''
 
 from os import system
+import sys
 import json
 from flask import Flask, request
 import Snake
 import logging
+import mood
 
 log = logging.getLogger('werkzeug')
 log.disabled = True
 
 app = Flask(__name__)
+_id = 0
 
-@app.route('/')
-def hello():
+@app.route('/<_mood>/')
+def hello(_mood):
+    global _id
+
+    print(_mood)
 
     # Load snake metadata
     f = open('snake_data.json')
@@ -23,32 +29,36 @@ def hello():
 
     # Return data
     print("Fielded /")
+    data['hello_response']['apiversion'] = _mood
+    data['hello_response']['author'] = _mood
+    _id += 1
     return data['hello_response']
 
-@app.route('/start', methods=['POST'])
-def start ():
+@app.route('/<_mood>/start', methods=['POST'])
+def start (_mood):
 
     # Get request body
-    data = request.json
+    data = request.get_json()
+    print("Fielded /start")
 
     # Trigger handler
     start_response = Snake.start( data )
 
     # Return data
-    print("Fielded /start")
     return start_response
 
-@app.route('/move', methods=['POST'])
-def move ():
+@app.route('/<_mood>/move', methods=['POST'])
+def move (_mood):
 
     # Get request body
-    data = request.json
+    data = request.get_json()
+    print("Fielded /move")
 
     # Trigger handler
+    mood.set_mood(_mood)
     move_response = Snake.move( data )
 
     # Return data
-    print("Fielded /move")
     return {"move":move_response}
 
-app.run(host="localhost", port=8000)
+app.run(host="localhost", port=sys.argv[1])
