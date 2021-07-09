@@ -116,5 +116,4 @@ class MinMax:
                 b = min(b, worst_score)
                 if b <= a:
                     break
-          :wq
-          return (worst_score, worst_move)
+            return (worst_score, worst_move)

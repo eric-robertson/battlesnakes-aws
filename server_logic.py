@@ -87,26 +87,52 @@ def choose_move(data: dict) -> str:
     for f in data['board']['food']:
         point = cvt_pt(f)
         board[point.x][point.y] = -1 # -1 indicated food
-   
     # avoid other snakes yes
     possible_moves = avoid_snakes(possible_moves, board)
     # try to avoid head-on collisions if possible
     possible_moves = avoid_head_on(possible_moves, data)
     # choose random move from remaining options if there are any
     rem = remaining_moves(possible_moves)
-    move = "left"
-    if len(rem) > 0:
+    
+    if len(rem) == 1:
+        return rem[0]
+    elif len(rem) == 0:
+        return "left"
+
+    best_move = ""
+    best_dist = 999
+
+    target = Point(board_height / 2 + 1, board_width / 2 + 1)
+    foods = [cvt_pt(f) for f in data['board']['food']]
+    if data['you']['health'] < 30 and len(foods) > 0:
+        closest_food = foods[0]
+        closest_dist = 999
+        for f in foods:
+            d = mh_dist(my_head, f)
+            if d < closest_dist:
+                closest_dist = d
+                closest_food = f
+        target = closest_food
+        
+    for move in rem:
+        d = mh_dist(possible_moves[move], target)
+        if d < best_dist:
+            best_dist = d
+            best_move = move         
+    
+    move = best_move
+    if len(rem) > 2 and random.random() < 0.3:
         move = random.choice(rem)
     
-
     print(f"CHOOSING MOVE: {move} from all valid options in {rem}")
     
     return move
 
 def use_tree_search(data):
-    state, my_idx = cvt_state(data)
-    strategy = MinMax(1)
-    move = strategy.decide_move(state, my_idx)
+    #state, my_idx = cvt_state(data)
+    #strategy = MinMax(1)
+    #move = strategy.decide_move(state, my_idx)
+    move = ""
     if move == "":
         return choose_move(data)
     else:
