@@ -16,7 +16,8 @@ def from_json (json_blob):
 
         # Load body
         for i,body in enumerate(snake['body']):
-            data[s][body['x'], body['y']] = i+1
+            if data[s][body['x'], body['y']] == 0:
+                data[s][body['x'], body['y']] = i+1
 
         # Set health & length info
         data[2,s,0] = snake['health']

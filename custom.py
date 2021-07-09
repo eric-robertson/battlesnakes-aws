@@ -4,7 +4,7 @@ from flask import Flask, request
 import Snake
 import Packager
 
-f = open('./states/a.json')
+f = open('./test/a.json')
 data = json.load( f )
 
 Packager.from_json(data).log()
