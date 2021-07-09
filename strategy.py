@@ -1,10 +1,14 @@
+<<<<<<< HEAD
 from util import GameState
 from math import tanh
 from copy import deepcopy
+=======
+>>>>>>> a41b87fb4b38ea5c8b5833bb5441a3e56708854b
 
 class MinMax:
     max_depth = 5
 
+<<<<<<< HEAD
     def __init__(self, m_depth: int):
         self.max_depth = m_depth
     
@@ -90,3 +94,10 @@ class MinMax:
                     break
             return (worst_score, worst_move)
 
+=======
+    def __init__(self, m_depth):
+        self.max_depth = m_depth
+    
+    def evaluate(state, snake):
+        if state.snakes[snake]
+>>>>>>> a41b87fb4b38ea5c8b5833bb5441a3e56708854b
