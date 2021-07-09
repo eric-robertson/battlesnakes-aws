@@ -48,20 +48,14 @@ class BattlesnakeServer(object):
         """
         data = cherrypy.request.json
 
-        # TODO - look at the server_logic.py file to see how we decide what move to return!
-        move = server_logic.choose_move(data)
+        move = server_logic.use_tree_search(data)
 
         return {"move": move}
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
     def end(self):
-        """
-        This function is called when a game your snake was in ends.
-        It's purely for informational purposes, you don't have to make any decisions here.
-        """
-        data = cherrypy.request.json
-
+        # data = cherrypy.request.json
         print("END")
         return "ok"
 

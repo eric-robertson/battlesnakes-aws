@@ -1,9 +1,8 @@
 import random
 from typing import List, Dict
 import numpy as np
-from AStar import *
-
-
+from strategy import MinMax
+from util import *
 
 def avoid_neck(my_head: Dict[str, int], my_body: List[dict], possible_moves: List[str]) -> List[str]:
     my_neck = cvt_pt(my_body[1])  # The segment of body right after the head is the 'neck'
@@ -95,7 +94,20 @@ def choose_move(data: dict) -> str:
     move = "left"
     if len(rem) > 0:
         move = random.choice(rem)
+    
 
     print(f"CHOOSING MOVE: {move} from all valid options in {rem}")
     
     return move
+
+def use_tree_search(data):
+    state, my_idx = cvt_state(data)
+
+    strategy = MinMax(4)
+    move = strategy.decide_move(state, my_idx)
+
+    if move == "":
+        return choose_move(data)
+
+    return move
+    

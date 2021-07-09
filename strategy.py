@@ -1,16 +1,27 @@
-<<<<<<< HEAD
 from util import GameState
 from math import tanh
 from copy import deepcopy
-=======
->>>>>>> a41b87fb4b38ea5c8b5833bb5441a3e56708854b
 
 class MinMax:
     max_depth = 5
 
-<<<<<<< HEAD
-    def __init__(self, m_depth: int):
-        self.max_depth = m_depth
+    def __init__(self, max_depth: int):
+        self.max_depth = max_depth
+
+    def decide_move(self, state: GameState, snake_idx: int) -> str:
+        a = float('-inf')
+        b = float('inf')
+        score, move = self.tree_search(state, snake_idx, "up", a, b, 0, self.max_depth, True)
+
+        if score < 0:
+            return ""
+        
+        next_state = deepcopy(state).make_move(move, snake_idx)
+        next_state.cleanup()
+        if not next_state.get_snake(snake_idx).alive:
+            return ""
+        
+        return move
     
     def evaluate(self, state: GameState, snake_idx: int) -> float:
         score = 0
@@ -93,11 +104,3 @@ class MinMax:
                 if b <= a:
                     break
             return (worst_score, worst_move)
-
-=======
-    def __init__(self, m_depth):
-        self.max_depth = m_depth
-    
-    def evaluate(state, snake):
-        if state.snakes[snake]
->>>>>>> a41b87fb4b38ea5c8b5833bb5441a3e56708854b

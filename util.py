@@ -11,9 +11,6 @@ MOVES = ['up', 'down', 'left', 'right']
 def mh_dist(p1, p2):
     return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
 
-def cvt_pt(dict_pt):
-    return [dict_pt['x'], dict_pt['y']]
-
 def remaining_moves(possible_moves):
     rem = []
     for move, pos in possible_moves.items():
@@ -544,3 +541,41 @@ class GameState:
             if snake.alive:
                 count += 1
         return count
+
+def cvt_pt(dict_pt):
+    return Point(dict_pt['x'] + 1, dict_pt['y'] + 1)
+    
+def cvt_snake(snake_data: dict, turn: int):
+
+    assert(snake_json["object"] == "snake");
+    int free_moves = FREE_MOVES - turn;
+    if (free_moves < 0) {
+        free_moves = 0;
+    }
+    int health = snake_json["health"];
+    string id = snake_json["id"];
+    Snake snake = Snake(health, turn, free_moves, id);
+
+    for point in snake_data['body']:
+        snake.add_point(cvt_pt(point))
+
+def cvt_state(data: dict):
+    height = data['board']['height']
+    width = data['board']['height']
+    state = GameState(width, height)
+
+    turn = data['turn']
+    for food in data['board']['food']:
+        state.addFood(cvt_pt(food))
+    
+    my_id = data['you']['id']
+    my_idx = -1
+    for snake_data in data['board']['snakes']:
+        snake = cvt_snake(snake_data, turn)
+        snake_idx = state.add_snake(snake)
+        if snake.id == my_id:
+            my_idx = snake_idx
+    
+    assert my_idx != -1
+    
+    return (state, my_idx)
