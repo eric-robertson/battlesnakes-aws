@@ -43,19 +43,19 @@ class Cell:
         self.t = EMPTY
     
     def occupy(self, idx:int):
-        occupants.add(idx)
+        self.occupants.add(idx)
     
     def vacate(self, idx:int):
-        occupants.remove(idx)
+        self.occupants.remove(idx)
     
     def vacate_all(self):
-        occupants = set()
+        self.occupants = set()
     
     def num_occupants(self) -> int:
-        return len(occupants)
+        return len(self.occupants)
     
     def is_occupant(self, idx:int) -> bool:
-        return idx in occupants
+        return idx in self.occupants
     
     def set_food(self):
         self.t = FOOD
@@ -64,8 +64,8 @@ class Cell:
 class Board:
 
     board = None
-	w = 0
-	h = 0
+    w = 0
+    h = 0
 
     def __init__(self, w, h):
         self.w = w
@@ -92,7 +92,7 @@ class Board:
     def sample_empty(self):
         x = random.choice(range(self.w)) + 1
         y = random.choice(range(self.h)) + 1
-        while self.get_point(Point(x, y)) != EMPTY
+        while self.get_type(Point(x, y)) != EMPTY:
             x = random.choice(range(self.w)) + 1
             y = random.choice(range(self.h)) + 1
         return Point(x, y)
@@ -103,7 +103,7 @@ class Board:
         self.board[point.x][point.y].occupy(idx)
     
     def vacate(self, point:Point, idx:int):
-        self.board[point.x][point.y] = EMPTY
+        self.board[point.x][point.y].t = EMPTY
     
     def num_occupants(self, point:Point) -> int:
         return self.board[point.x][point.y].num_occupants()
@@ -112,7 +112,7 @@ class Board:
         return self.board[point.x][point.y].t
 
     def set_type(self, point:Point, new_t:int):
-        return self.board[point.x][point.y].t = new_t
+        self.board[point.x][point.y].t = new_t
 
     def get_occupants(self, point:Point):
         return self.board[point.x][point.y].occupants
@@ -125,17 +125,17 @@ class Board:
 
     def in_board(self, point:Point):
         return point.y >= 0 and point.x >= 0 and \
-        point.y < self.board.shape[1] and point.x < self.board.shape[0]
+        point.y < self.h + 1 and point.x < self.w + 2
     
     def is_safe(self, point:Point):
-        c = self.board[point.x][point.y]
+        c = self.board[point.x][point.y].t
         return c == FOOD or c == EMPTY
     
     # def will_be_safe(self, point:Point, dist:int):
     #     c = self.board[point.x][point.y]
     #     return c != WALL and c <= dist
 
-    def neighbors(self, p: Point) -> List[Point]:
+    def neighbors(self, p: Point):
         result = []
         for dir in MOVES:
             n = p.move(dir)
@@ -144,7 +144,7 @@ class Board:
         return result
     
     # CAN BE IMPROVED WITH (1) A STAR (2) SNEK TAIL CONTRACTION (keep track of distance, use will_be_safe)
-    def find_food(self, start: Point) -> List[List[Point]]:
+    def find_food(self, start: Point):
         paths = []
         q = []
         visited = set()
@@ -191,11 +191,11 @@ class Snake:
     id = ""
     points = []
 
-    def __init__(self, start: Point, free_moves = 2: int, id = "": str):
-        self.health = 100
+    def __init__(self, health, turn, free_moves = 2, id = ""):
+        self.health = health
         self.alive = True
         self.score = 0
-        points = [start]
+        self.points = []
         self.free_moves = free_moves
         self.id = id
 
@@ -238,9 +238,10 @@ class Snake:
             p = head.move(dir)
             if len(self) > 1:
                 if self.points[1] != p:
-                    moves.push_back(dir)
+                    moves.append(dir)
             else:
-                moves.push_back(dir)
+                moves.append(dir)
+        return moves
         
     def add_point(self, p:Point):
         self.points.append(p)
@@ -259,7 +260,7 @@ class GameState:
     snakes = []
     board = None
 
-    def __init__(self, w: int, h: int, max_food = 0: int):
+    def __init__(self, w: int, h: int, max_food = 0):
         self.board = Board(w, h)
         self.timer = 0
         self.max_food = max_food
@@ -273,16 +274,16 @@ class GameState:
     def addFood(self):
         p = self.board.sample_empty()
         self.board.put_food(p)
-        self.cur_food += 1
+        self.current_food += 1
     
     def addFood(self, p:Point):
         self.board.put_food(p)
-        self.cur_food += 1
+        self.current_food += 1
 
     def add_snake(self, start:Point):
         snake = Snake(start)
         snake_idx = len(self.snakes)
-        self.board.put_snake(start, snake_idx)
+        self.board.occupy(start, snake_idx)
         self.snakes.append(snake)
         return snake_idx
     
@@ -290,7 +291,8 @@ class GameState:
         snake_idx = len(self.snakes)
         self.snakes.append(snake)
         for p in snake.points:
-            self.board.put_snake(p, snake_idx)
+            self.board.occupy(p, snake_idx)
+        return snake_idx
     
     def get_snake(self, snake_idx:int) -> Snake:
         return self.snakes[snake_idx]
@@ -300,21 +302,21 @@ class GameState:
         head = snake.make_move(dir)
         snake.lose_health()
 
-        if self.board.snake_at(head) == snake_idx: # self collision
+        if self.board.is_occupant_of(head, snake_idx): # self collision
             self.snakes[snake_idx].alive = False
         
-        self.board.put_snake(head, snake_idx)
-        c = self.board.get_point(head)
+        self.board.occupy(head, snake_idx)
+        c = self.board.get_type(head)
 
         if c == FOOD:
             self.snakes[snake_idx].health = 100
         elif c == WALL:
             tail = snake.pop_tail()
-            board.vacate(tail)
+            self.board.vacate(tail, snake_idx)
         elif c == EMPTY:
             if snake.free_moves == 0:
                 tail = snake.pop_tail()
-                board.vacate(tail)
+                self.board.vacate(tail, snake_idx)
             else:
                 snake.use_free_move()
 
@@ -356,8 +358,8 @@ class GameState:
                 snake.alive = False
             if snake.alive:
                 current_point = snake.get_head()
-                check_collision(current_point)
-                remove_food(current_point)
+                self.check_collision(current_point)
+                self.remove_food(current_point)
         
         for snake_idx in range(len(self.snakes)):
             snake = self.snakes[snake_idx]
@@ -369,7 +371,7 @@ class GameState:
         while self.current_food < self.max_food:
             self.add_food()
         
-        assert self.is_valid()
+        # assert self.is_valid()
 
         self.timer += 1
             
@@ -412,7 +414,7 @@ class GameState:
     def is_safe(self, point:Point, dist:int) -> bool:
         return self.board.get_type(point) != WALL and self.will_be_safe(point, dist)
     
-    def find_food(self, start:Point) -> List[List[Point]]:
+    def find_food(self, start:Point):
         depth = 0
         paths = []
         q = []
@@ -425,7 +427,7 @@ class GameState:
 
         while len(q) > 0:
             current = q.pop(0)
-            if current.x == -1 and curent.y == -1:
+            if current.x == -1 and current.y == -1:
                 depth += 1
                 q.append(Point(-1,-1))
                 if q[0].x == -1 and q[0].y == -1:
@@ -435,7 +437,7 @@ class GameState:
                     if self.board.in_board(point) and self.is_safe(point, depth) and point not in visited:
                         parent[point] = current
                         visited.add(point)
-                        if board.get_type(point) == FOOD:
+                        if self.board.get_type(point) == FOOD:
                             path = []
                             while start != point:
                                 path.append(point)
@@ -498,7 +500,7 @@ class GameState:
         pair_depth_mark = (Point(-1,-1), -1)
         mark = -1
         q = []
-        v = set()
+        v = dict()
         counts = [0 for i in range(len(self.snakes))]
 
         for i in range(len(self.snakes)):
@@ -528,12 +530,12 @@ class GameState:
                             counts[other] -= 1
                             v[point] = mark
                     elif self.board.in_board(point) and self.is_safe(point, depth):
-                        if board.get_type(point) == FOOD and idx == snake_idx and food_depth == -1:
+                        if self.board.get_type(point) == FOOD and idx == snake_idx and food_depth == -1:
                             food_depth = depth
                         counts[idx] += 1
                         v[point] = idx
                         q.append((point, idx))
-    return (counts[snake_idx], food_depth)
+        return counts[snake_idx], food_depth
 
     def num_alive(self) -> int:
         count = 0
@@ -547,17 +549,15 @@ def cvt_pt(dict_pt):
     
 def cvt_snake(snake_data: dict, turn: int):
 
-    assert(snake_json["object"] == "snake");
-    int free_moves = FREE_MOVES - turn;
-    if (free_moves < 0) {
-        free_moves = 0;
-    }
-    int health = snake_json["health"];
-    string id = snake_json["id"];
-    Snake snake = Snake(health, turn, free_moves, id);
+    free_moves = max(0, 2 - turn)
+    health = snake_data["health"]
+    snake_id = snake_data["id"]
+    snake = Snake(health, turn, free_moves, snake_id);
 
     for point in snake_data['body']:
         snake.add_point(cvt_pt(point))
+    
+    return snake
 
 def cvt_state(data: dict):
     height = data['board']['height']
@@ -578,4 +578,4 @@ def cvt_state(data: dict):
     
     assert my_idx != -1
     
-    return (state, my_idx)
+    return state, my_idx

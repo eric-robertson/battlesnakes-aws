@@ -60,6 +60,7 @@ class MinMax:
         return score
 
     def tree_search(self, state: GameState, snake_idx: int, move: str, a: float, b: float, depth: int, max_depth: int, max_player: bool):
+        print("depth =", depth)
         snake = state.get_snake(snake_idx)
         # delta = 
         if depth == self.max_depth or not snake.alive:
@@ -69,14 +70,18 @@ class MinMax:
         opponent = state.get_snake(opponent_idx)
 
         if max_player:
+            print("max player")
             best_score = float('-inf')
             best_move = ''
 
             for move in snake.get_moves():
+                print("moving", move)
                 # make a copy of the game state
-                next_state = deepcopy(state).make_move(move, snake_idx)
+                next_state = deepcopy(state)
+                next_state.make_move(move, snake_idx)
 
-                result = self.tree_search(next_state, snake_idx, a, b, depth + 1, max_depth, not max_player)
+                result = self.tree_search(next_state, snake_idx, move, a, b, depth + 1, max_depth, not max_player)
+                print("result =", result)
                 if result[0] > best_score:
                     best_score = result[0]
                     best_move = move

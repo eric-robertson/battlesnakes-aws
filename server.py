@@ -21,10 +21,10 @@ class BattlesnakeServer(object):
         return {
             "apiversion": "1",
             "author": "hmmoro",
-            "color": "#f5a422",
-            "secondary_color": "777777",
-            "head": "default",
-            "tail": "default",
+            "color": "#d900ff",
+            "secondary_color": "#777777",
+            "head": "safe",
+            "tail": "round-bum"
         }
 
     @cherrypy.expose
