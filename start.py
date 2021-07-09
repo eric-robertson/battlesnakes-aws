@@ -39,7 +39,6 @@ def start (_mood):
     # Get request body
     data = request.get_json()
     print("Fielded /start")
-    print("data is:", json.dumps(data))
 
     # Trigger handler
     start_response = Snake.start( data )
@@ -52,8 +51,7 @@ def move (_mood):
 
     # Get request body
     data = request.get_json()
-    print("Fielded /move")
-    print("data is:", json.dumps(data))
+    print("Fielded /move", _mood)
 
     # Trigger handler
     mood.set_mood(_mood)

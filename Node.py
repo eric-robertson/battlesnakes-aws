@@ -50,7 +50,7 @@ class Node:
         score_options = []
 
         if len(self.children) == 0:
-            return -np.inf
+            return -9999
 
         if logging: print("Of your moves:")
         for your_move in self.children:
@@ -60,7 +60,8 @@ class Node:
                 if logging: print('then', decode(their_move), ':', self.children[your_move][their_move].get_score())
                 sub_scores.append( self.children[your_move][their_move].get_score() )
             score_options.append( min(sub_scores) )
-        self.transient_score = max( score_options )
+
+        self.transient_score = max( score_options ) + 1
 
         if logging: print('Reset to: ', self.transient_score )
 
@@ -69,7 +70,7 @@ class Node:
 
     def get_prediction (self):
 
-        best = (-np.inf, 0)
+        best = (-9999, 0)
 
         for your_move in self.children:
 

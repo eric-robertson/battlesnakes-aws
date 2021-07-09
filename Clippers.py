@@ -14,8 +14,8 @@ def judge ( board_state ):
     score_0 = score_board( board_state, 0)
     score_1 = score_board( board_state, 1)
 
-    if score_0 <= 0: return -np.inf
-    if score_1 == np.inf: return -np.inf
+    if score_0 < 0: return score_0
+    if score_1 == np.inf: return -9999
     if score_1 < 0: return np.inf
 
     return score_0
@@ -26,7 +26,7 @@ def score_board ( board_state, snake ):
         return mood.score_board( board_state, snake )
     if snake == 1:
         if board_state.getDead(1):
-            return -np.inf
+            return -9999
         if board_state.getDead(0):
             return np.inf
         return 0
@@ -39,6 +39,9 @@ def register_branch(branch_node, label ):
     hq.heappush(jobs, (priority,job_id, label, branch_node) )
 
 def select_brach ():
+    if len(jobs) == 0:
+        return False, False
+
     next = jobs[0]
     hq.heappop( jobs )
 
@@ -47,7 +50,7 @@ def select_brach ():
 
     #print("Selected Branch", next[2])
     #next[3].log()
-    return next[3]
+    return True, next[3]
 
 def clear_job_tree():
     global jobs

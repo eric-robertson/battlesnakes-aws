@@ -22,7 +22,9 @@ def move ( request_data):
     # Start tree search
     while True:
         
-        target_branch = Clippers.select_brach()
+        has_next, target_branch = Clippers.select_brach()
+        if not has_next: break
+
         next_branches = Oracle.prophesize( target_branch.board )
         target_branch.register_childen( next_branches )
 
@@ -31,6 +33,7 @@ def move ( request_data):
         
     # Finished, lets get our best board
     score, move = game_tree.get_prediction()
+    print(['left', 'right', 'up', 'down'][move], 'with score', round(score,2))
 
     Clippers.clear_job_tree()
     return ['left', 'right', 'up', 'down'][move]
