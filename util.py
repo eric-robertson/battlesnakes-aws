@@ -70,7 +70,7 @@ class Board:
     def __init__(self, w, h):
         self.w = w
         self.h = h
-        self.board = [[Cell() for i in range(w + 2)] for i in range(h + 2)]
+        self.board = [[Cell() for i in range(h + 2)] for i in range(w + 2)]
         self.clear()
         # self.board = np.zeros((w + 2, h + 2))
         # self.snakes = np.zeros_like(self.board) - 1
@@ -87,9 +87,10 @@ class Board:
 
     def print(self):
         print()
-        for row in self.board:
-            for cell in row:
-                if cell.t == EMPTY:
+        for y in reversed(range(self.h + 2)):
+            for x in range(self.w + 2):
+                cell = self.board[x][y]
+                if cell.t == EMPTY and cell.num_occupants() == 0:
                     print(".", end=" ")
                 elif cell.t == WALL:
                     print("X", end=" ")
@@ -314,7 +315,6 @@ class GameState:
         snake = self.snakes[snake_idx]
         head = snake.make_move(dir)
         snake.lose_health()
-
         if self.board.is_occupant_of(head, snake_idx): # self collision
             self.snakes[snake_idx].alive = False
         
@@ -565,8 +565,8 @@ def cvt_snake(snake_data: dict, turn: int):
     free_moves = max(0, 2 - turn)
     health = snake_data["health"]
     snake_id = snake_data["id"]
-    snake = Snake(health, turn, free_moves, snake_id);
-
+    snake = Snake(health, turn, free_moves, snake_id)
+    snake.points = []
     for point in snake_data['body']:
         snake.add_point(cvt_pt(point))
     
@@ -576,16 +576,17 @@ def cvt_state(data: dict):
     height = data['board']['height']
     width = data['board']['height']
     state = GameState(width, height)
+    state.snakes = []
 
     turn = data['turn']
     for food in data['board']['food']:
         state.addFood(cvt_pt(food))
-    
     my_id = data['you']['id']
     my_idx = -1
     for snake_data in data['board']['snakes']:
         snake = cvt_snake(snake_data, turn)
         snake_idx = state.add_snake(snake)
+        print("Added snake_idx ", snake_idx)
         if snake.id == my_id:
             my_idx = snake_idx
     

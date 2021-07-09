@@ -107,7 +107,6 @@ def use_tree_search(data):
     state, my_idx = cvt_state(data)
     strategy = MinMax(1)
     move = strategy.decide_move(state, my_idx)
-    move = ""
     if move == "":
         return choose_move(data)
     else:

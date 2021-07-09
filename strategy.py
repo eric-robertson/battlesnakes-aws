@@ -9,6 +9,8 @@ class MinMax:
         self.max_depth = max_depth
 
     def decide_move(self, state: GameState, snake_idx: int) -> str:
+        print("-------------------- decide_move(",snake_idx,") ----------------------")
+
         a = float('-inf')
         b = float('inf')
         score, move = self.tree_search(state, snake_idx, "up", a, b, 0, self.max_depth, True)
@@ -59,28 +61,33 @@ class MinMax:
 
         return score
 
-    def tree_search(self, state: GameState, snake_idx: int, move: str, a: float, b: float, depth: int, max_depth: int, max_player: bool):
+    def tree_search(self, state: GameState, snake_idx: int, mov: str, a: float, b: float, depth: int, max_depth: int, max_player: bool):
         print("depth =", depth, "/", max_depth)
-        state.board.print()
+        # state.board.print()
         snake = state.get_snake(snake_idx)
-        # delta = 
+        # delta =
+        print("a")
         if depth == self.max_depth or not snake.alive:
-            return (self.evaluate(state, snake_idx), move)
+            print("reached max depth:", end=' ')
+            score = self.evaluate(state, snake_idx)
+            print(score)
+            return (score, mov)
         
         opponent_idx = state.get_opponent(snake_idx)
         opponent = state.get_snake(opponent_idx)
+        print(snake_idx,"vs",opponent_idx)
 
         if max_player:
-            print("max player")
+            print(snake_idx,"= max player")
             best_score = float('-inf')
             best_move = ''
 
             for move in snake.get_moves():
-                print("moving", move)
-                # make a copy of the game state
+                print("trying:", move)
+                # make a copy of the game state TODO: move forward & back with board: stack of moves
                 next_state = deepcopy(state)
                 next_state.make_move(move, snake_idx)
-
+                
                 result = self.tree_search(next_state, snake_idx, move, a, b, depth + 1, max_depth, not max_player)
                 print("result =", result)
                 if result[0] > best_score:
@@ -109,4 +116,5 @@ class MinMax:
                 b = min(b, worst_score)
                 if b <= a:
                     break
-            return (worst_score, worst_move)
+          :wq
+          return (worst_score, worst_move)
