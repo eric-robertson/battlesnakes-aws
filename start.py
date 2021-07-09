@@ -29,7 +29,6 @@ def hello(_mood):
 
     # Return data
     print("Fielded /")
-    data['hello_response']['apiversion'] = _mood
     data['hello_response']['author'] = _mood
     _id += 1
     return data['hello_response']
