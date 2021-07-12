@@ -2,9 +2,8 @@
 
 import numpy as np
 
-# TODO: change layer order so snakes are at higher layers
-INFO_LAYER = 2 # 0
-FOOD_LAYER = 3 # 1
+INFO_LAYER = 0
+FOOD_LAYER = 1
 
 HEALTH_IDX = 0
 LENGTH_IDX = 1
@@ -31,28 +30,50 @@ class BoardState:
     def getDead ( self, snake ):
         return self.data[INFO_LAYER, snake, DEAD_IDX]
     def getLayer ( self, snake ):
-        return self.data[snake]
+        return self.data[2 + snake]
     def getHeads ( self ):
-        return np.where(self.data[:2] == 1)
+        return np.where(self.data[2:] == 1)
+    def getHead ( self, snake ):
+        return np.where(self.data[2 + snake] == 1)
     def setDead ( self, snake ):
-        self.data[INFO_LAYER, snake, DEAD_IDX] = 1
+        self.data[INFO_LAYER, 2 + snake, DEAD_IDX] = 1
     def eatFood ( self, snake ):
-        self.data[INFO_LAYER, snake, HEALTH_IDX] = MAX_HEALTH
-        self.data[INFO_LAYER, snake, LENGTH_IDX] += 1
+        self.data[INFO_LAYER, 2 + snake, HEALTH_IDX] = MAX_HEALTH
+        self.data[INFO_LAYER, 2 + snake, LENGTH_IDX] += 1
+    
+    def totalSnakes(self):
+        return self.data.shape[0] - 2
+    def numDeadSnakes(self):
+        return np.sum(self.data[INFO_LAYER, :, DEAD_IDX])
+    def numAliveSnakes(self):
+        return self.totalSnakes() - self.numDeadSnakes()
+    
+    def neighbors(self, point):
+        pass # TODO
+
+    # returns whether or not a point will be safe in depth game turns
+    def isSafe(self, point, depth):
+        occupant = np.max(self.data[2:, point])
+        if occupant == 0:
+            return True
+        snake = np.argmax(self.data[2:, point])
+        length = self.getLength(snake)
+        return occupant + depth > length
+
 
     def log ( self ):
         print("Board:")
         for j in range(self.board.shape[2]-1,-1,-1):
             row = ""
             for i in range (self.board.shape[1]):
-                if self.data[0,i,j] == 1:
+                if self.data[2,i,j] == 1:
                     row+="A"
-                elif self.data[0,i,j] > 1:
-                    row+= str(int(self.data[1,i,j]))
-                elif self.data[1,i,j] == 1:
+                elif self.data[2,i,j] > 1:
+                    row+= str(int(self.data[2,i,j]))
+                elif self.data[3,i,j] == 1:
                     row+="B"
-                elif self.data[1,i,j] > 1:
-                    row+= str(int(self.data[1,i,j]))
+                elif self.data[3,i,j] > 1:
+                    row+= str(int(self.data[3,i,j]))
 
                 elif self.data[FOOD_LAYER,i,j] != 0:
                     row += "F"
@@ -66,15 +87,15 @@ class BoardState:
         print("---------------------")
 
     # Step forward given h1 & h2
-    def do_game_tick ( self, h1, h2 ):
+    def do_game_tick ( self, heads):
 
         # Increment each snake element
-        snakes = self.data[:2]
+        snakes = self.data[2:]
         snakes[snakes != 0] += 1
 
-        # Move snakes
-        self.move_snake( 0, h1 )
-        self.move_snake( 1, h2 )
+        # Move snakes TODO: vectorize
+        for s in range(snakes.shape[0]):
+            self.move_snake( s, heads[s] )
 
         self.check_collide()
 
@@ -102,24 +123,26 @@ class BoardState:
         # We did collide, who hit who
         _, xs, ys = self.getHeads()
 
+        snakes = self.data[2:]
         # Simple check here
-        if np.any( self.getLayer(0) * self.getLayer(1) ): 
-        
-            # Snake 0 just hit snake 1
-            if self.isSnakeBody(1, xs[0],ys[0]):
-                self.setDead( 0 )
-            elif self.isSnakeBody(0, xs[1],ys[1]):
-                self.setDead( 1 )
-            else:
-                h0 = self.getLength( 0 )
-                h1 = self.getLength( 1 )
-                if h0 >= h1: 
-                    self.setDead(1)
-                if h1 >= h0:
-                    self.setDead(0)
+        if np.any( np.multiply(snakes, axis=0) ):
+            # pairwise comparisons
+            for s1 in range(snakes.shape[0] - 1):
+                for s2 in range(s1 + 1, snakes.shape[0]):
+                    if self.isSnakeBody(s2, xs[s1], ys[s1]):
+                        self.setDead(s1)
+                    elif self.isSnakeBody(s1, xs[s2], ys[s2]):
+                        self.setDead(s2)
+                    else: # head-to-head collision, larger survives
+                        h1 = self.getLength(s1)
+                        h2 = self.getLength(s2)
+                        if h1 >= h2:
+                            self.setDead(h2)
+                        if h2 <= h1:
+                            self.setDead(h1)
             
         # Grab food
-        for s in range(2):
+        for s in range(snakes.shape[0]):
             if not self.getDead( s ):
                 if self.getLayer(FOOD_LAYER)[xs[s],ys[s]]:
                     self.data[FOOD_LAYER,xs[s],ys[s]] = 0

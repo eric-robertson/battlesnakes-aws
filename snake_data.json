@@ -1,10 +1,11 @@
 {
     "hello_response" : {
         "apiversion": "1",
-        "author": "EricRobertson",
-        "color" : "#888888",
-        "head" : "default",
-        "tail" : "default",
+        "author": "AWS Intern Team 14 (Eric Robertson, Robert Hammond, Ellis Johnson",
+        "color" : "#03fca1",
+        "secondary-color" : "ff33cf",
+        "head" : "safe",
+        "tail" : "round-bum",
         "version" : "0.0.1-beta"
     }
 }
