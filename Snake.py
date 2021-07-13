@@ -22,7 +22,12 @@ def move ( request_data):
     strategy = "AlphaBeta"
     if strategy == "AlphaBeta":
         player = Packager.find_me( request_data )
-        move = AlphaBeta.decide_move(game_board, player, 2)
+        max_depth = 1
+        if game_board.numAliveSnakes() <= 2:
+            max_depth = 2
+        move = AlphaBeta.decide_move(game_board, player, max_depth)
+        now = time.time() * 1000
+        print(f"Latency = {now - start}")
         return ['left', 'right', 'up', 'down'][move]
 
     game_tree = Node( 0.5, game_board, False, 'root' )

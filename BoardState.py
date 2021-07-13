@@ -29,23 +29,23 @@ class BoardState:
         return self.data[INFO_LAYER, snake, LENGTH_IDX]
     def getDead ( self, snake ):
         return self.data[INFO_LAYER, snake, DEAD_IDX]
-    def getLayer ( self, snake ):
-        return self.data[2 + snake]
+    def getLayer ( self, layer ):
+        return self.data[layer]
     def getHeads ( self ):
         return np.where(self.data[2:] == 1)
     def getHead ( self, snake ):
         xs, ys = np.where(self.data[2 + snake] == 1)
         return xs[0], ys[0]
     def setDead ( self, snake ):
-        self.data[INFO_LAYER, 2 + snake, DEAD_IDX] = 1
+        self.data[INFO_LAYER, snake, DEAD_IDX] = 1
     def eatFood ( self, snake ):
-        self.data[INFO_LAYER, 2 + snake, HEALTH_IDX] = MAX_HEALTH
-        self.data[INFO_LAYER, 2 + snake, LENGTH_IDX] += 1
+        self.data[INFO_LAYER, snake, HEALTH_IDX] = MAX_HEALTH
+        self.data[INFO_LAYER, snake, LENGTH_IDX] += 1
     
     def totalSnakes(self):
         return self.data.shape[0] - 2
     def numDeadSnakes(self):
-        return np.sum(self.data[INFO_LAYER, :, DEAD_IDX])
+        return np.sum(self.data[INFO_LAYER, 2:, DEAD_IDX])
     def numAliveSnakes(self):
         return self.totalSnakes() - self.numDeadSnakes()
 
@@ -101,18 +101,19 @@ class BoardState:
     def move_snake ( self, snake, head ):
         # Grab length and snake layer
         length = self.getLength( snake )
-        layer = self.getLayer( snake )
+        layer = self.getLayer( 2 + snake )
         
         # Should we add another cell?
-        if length != layer.max():
-            layer[ layer == layer.max() ] = 0 # == 0?
+        if self.getLayer(FOOD_LAYER)[head[0], head[1]]:
+            self.eatFood(snake)
+        layer[ layer >= layer.max() ] = 0 # == 0?
 
         # Did we hit ourself?
         if layer[head[0], head[1]] != 0:
             self.setDead( snake )
 
         # Set our new head
-        layer[head] = 1
+        layer[head[0], head[1]] = 1
 
     # Check snake-on-snake collision
     def check_collide ( self ):
@@ -123,24 +124,36 @@ class BoardState:
         snakes = self.data[2:]
         # Simple check here
         if np.any( np.product(snakes, axis=0) ):
-            # pairwise comparisons
+            # pairwise comparisons TODO: vectorize
             for s1 in range(snakes.shape[0] - 1):
                 for s2 in range(s1 + 1, snakes.shape[0]):
                     if self.isSnakeBody(s2, xs[s1], ys[s1]):
                         self.setDead(s1)
                     elif self.isSnakeBody(s1, xs[s2], ys[s2]):
                         self.setDead(s2)
-                    else: # head-to-head collision, larger survives
-                        h1 = self.getLength(s1)
-                        h2 = self.getLength(s2)
-                        if h1 >= h2:
-                            self.setDead(s2)
-                        if h2 <= h1:
-                            self.setDead(s1)
+        
+            # head-on attempt
+            heads_only = 1 - np.abs(np.sign(snakes - 1))
+            # print("heads only = ", heads_only)
+            xs2, ys2 = np.where(np.product(heads_only, axis=0))
+            for i in range(len(xs2)):
+                x = xs2[i]
+                y = ys2[i]
+                involved = np.where(snakes[:, x, y] == 1)[0]
+                lengths = np.array([self.getLength(s) for s in involved])
+                max_length = np.max(lengths)
+                n_max = len(np.where(lengths == max_length)[0])
+                if n_max > 1:
+                    for s in involved:
+                        self.setDead(s)
+                else:
+                    for s in involved:
+                        if self.getLength(s) < int(max_length):
+                            self.setDead(s)
             
         # Grab food
         for s in range(snakes.shape[0]):
             if not self.getDead( s ):
                 if self.getLayer(FOOD_LAYER)[xs[s],ys[s]]:
                     self.data[FOOD_LAYER,xs[s],ys[s]] = 0
-                    self.eatFood( s )
+                    # self.eatFood( s ) # already done this when moving snake

@@ -52,6 +52,7 @@ def move (_mood):
     # Get request body
     data = request.get_json()
     print("Fielded /move", _mood)
+    # print(data) # for testing
 
     # Trigger handler
     mood.set_mood(_mood)

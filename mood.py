@@ -1,5 +1,7 @@
 from BoardState import BoardState, FOOD_LAYER
 import numpy as np
+moves = [(-1,0,0), (1,0,1), (0,1,2), (0,-1,3)]
+
 
 global mood
 
@@ -7,7 +9,7 @@ def set_mood ( newMood):
     global mood
     mood = newMood
 
-def score_board (board_state, snake ):
+def score_board (board_state, snake):
 
     if board_state.getDead(snake): return float('-inf')
 
@@ -23,7 +25,7 @@ def score_board (board_state, snake ):
     if mood == 'rational':
         return rational( board_state, snake )
 
-    return center( board_state, snake ) * (board_state.getHealth(snake) / 100)
+    return rational( board_state, snake )
 
 def center ( board_state, snake ):
     _, xs, ys = board_state.getHeads()
@@ -38,7 +40,7 @@ def close ( board_state, snake ):
 def hungry ( board_state, snake ):
     return board_state.getLength(snake)
 
-def rational ( board_state, snake ):
+def old_rational ( board_state, snake ):
     score = 0
 
     if board_state.getLength(snake) > board_state.getLength(1-snake):
@@ -74,7 +76,6 @@ def voronoi(state: BoardState, snake):
     for i in range(len(counts)):    
         if not state.getDead(i):
             head = state.getHead(i)
-            print("head = ", head)
             p = (head, i)
             q.append(p)
             v[head] = i
@@ -91,13 +92,13 @@ def voronoi(state: BoardState, snake):
             head = p[0]
             idx = p[1]
             
-            for point in state.neighbors(head):
+            for point in [(head[0] + moves[m][0], head[1] + moves[m][1]) for m in range(4)]:
                 if point in v:
                     other = v[point]
                     if other != -1 and other != idx:
                         counts[other] -= 1
                         v[point] = -1
-                elif state.inBounds(point) and state.isSafe(point, depth):
+                elif state.inBounds(point[0], point[1]) and state.isSafe(point[0], point[1], depth):
                     if food_depth == -1 and idx == snake and state.getLayer(FOOD_LAYER)[point]:
                         food_depth = depth
                     counts[idx] += 1
@@ -122,33 +123,37 @@ def closest_food(state, snake):
             if q[0] is None:
                 break
         else:
-            for point in state.neighbors(current):
-                if state.inBounds(point[0], point[1]) and state.isSafe(point, depth) and point not in v:
+            for point in [(current[0] + moves[m][0], current[1] + moves[m][1]) for m in range(4)]:
+                if state.inBounds(point[0], point[1]) and state.isSafe(point[0], point[1], depth) and point not in v:
                     v.add(point)
                     if foods[point]:
                         return depth
     return depth
 
-def rational2(state, snake):
+def rational(state, snake):
     score = 0
     
     num_alive = state.numAliveSnakes()
     length = state.getLength(snake)
     free_squares, owned_food_depth = voronoi(state, snake)
     if free_squares == 0:
-        return float('-inf')
+        return -1e8
     
     score += 1e5 / num_alive
-    score += 10 * free_squares
-    score += 0.8 / length
+    # print(f"num alive score = {1e5 / num_alive}")
+    score += 100 * np.log(free_squares)
+    # print(f"free square score = {100 * np.log(free_squares)}")
+    score += 16 * length
 
     food_length = owned_food_depth
     if food_length == -1:
         food_length = closest_food(state, snake)
     if state.getHealth(snake) < food_length:
-        return float('-inf') # starvation is inevitable
-    breathing_room = snake.health - food_length
-    score += 100 * np.tanh(0.15 * breathing_room)
+        return -1e8 # starvation is inevitable
+    breathing_room = state.getHealth(snake) - food_length - 1
+    score += 150 * np.arctan(0.12 * breathing_room - 0.5)
+    # print(f"Breathing room = {breathing_room} ({100 * np.arctan(0.12 * breathing_room):.4f})")
+    # state.log("  ")
     
     return score
     
