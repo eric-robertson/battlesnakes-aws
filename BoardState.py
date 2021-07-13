@@ -38,6 +38,7 @@ class BoardState:
         return xs[0], ys[0]
     def setDead ( self, snake ):
         self.data[INFO_LAYER, snake, DEAD_IDX] = 1
+        self.data[2 + snake] = 0
     def eatFood ( self, snake ):
         self.data[INFO_LAYER, snake, HEALTH_IDX] = MAX_HEALTH
         self.data[INFO_LAYER, snake, LENGTH_IDX] += 1
@@ -104,9 +105,9 @@ class BoardState:
         layer = self.getLayer( 2 + snake )
         
         # Should we add another cell?
+        #     self.eatFood(snake)
         if self.getLayer(FOOD_LAYER)[head[0], head[1]]:
-            self.eatFood(snake)
-        layer[ layer >= layer.max() ] = 0 # == 0?
+            layer[ layer >= layer.max() ] = 0 # == 0?
 
         # Did we hit ourself?
         if layer[head[0], head[1]] != 0:
@@ -150,10 +151,11 @@ class BoardState:
                     for s in involved:
                         if self.getLength(s) < int(max_length):
                             self.setDead(s)
+                            print(f"snake {s} loses head-on")
             
         # Grab food
         for s in range(snakes.shape[0]):
             if not self.getDead( s ):
                 if self.getLayer(FOOD_LAYER)[xs[s],ys[s]]:
                     self.data[FOOD_LAYER,xs[s],ys[s]] = 0
-                    # self.eatFood( s ) # already done this when moving snake
+                    self.eatFood( s ) # already done this when moving snake

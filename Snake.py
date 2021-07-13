@@ -22,7 +22,7 @@ def move ( request_data):
     strategy = "AlphaBeta"
     if strategy == "AlphaBeta":
         player = Packager.find_me( request_data )
-        max_depth = 1
+        max_depth = 2
         if game_board.numAliveSnakes() <= 2:
             max_depth = 2
         move = AlphaBeta.decide_move(game_board, player, max_depth)

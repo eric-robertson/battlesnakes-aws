@@ -1,6 +1,7 @@
 from BoardState import BoardState, FOOD_LAYER
 import numpy as np
 moves = [(-1,0,0), (1,0,1), (0,1,2), (0,-1,3)]
+import collections
 
 
 global mood
@@ -69,7 +70,7 @@ def old_rational ( board_state, snake ):
 def voronoi(state: BoardState, snake):
     depth = 0
     food_depth = -1
-    q = [] # TODO: change to dequeue
+    q = collections.deque([])
     v = dict()
     counts = [0 for i in range(state.totalSnakes())]
 
@@ -82,7 +83,7 @@ def voronoi(state: BoardState, snake):
     q.append(None)
 
     while len(q) > 0:
-        p = q.pop(0) # very inefficient
+        p = q.popleft()
         if p is None:
             depth += 1
             q.append(None)
@@ -111,12 +112,12 @@ def closest_food(state, snake):
     foods = state.getLayer(FOOD_LAYER)
     head = state.getHead(snake)
     depth = 0
-    q = [head]
+    q = collections.deque([head])
     v = set(q)
     q.append(None)
 
     while len(q) > 0:
-        current = q.pop(0)
+        current = q.popleft()
         if current is None:
             depth += 1
             q.append(None)
@@ -136,14 +137,20 @@ def rational(state, snake):
     num_alive = state.numAliveSnakes()
     length = state.getLength(snake)
     free_squares, owned_food_depth = voronoi(state, snake)
-    if free_squares == 0:
+    if free_squares <= 5:
         return -1e8
     
-    score += 1e5 / num_alive
+    score += 1e4 / num_alive
     # print(f"num alive score = {1e5 / num_alive}")
-    score += 100 * np.log(free_squares)
+    if num_alive == 2:
+        score += 100 * np.log(free_squares)
+    else:
+        score += 10 * np.log(free_squares)
     # print(f"free square score = {100 * np.log(free_squares)}")
-    score += 16 * length
+    if num_alive == 2:
+        score += 16 * length
+    else:
+        score += 64 * length
 
     food_length = owned_food_depth
     if food_length == -1:
@@ -152,8 +159,12 @@ def rational(state, snake):
         return -1e8 # starvation is inevitable
     breathing_room = state.getHealth(snake) - food_length - 1
     score += 150 * np.arctan(0.12 * breathing_room - 0.5)
+    if num_alive > 2:
+        score -= 8 * food_length
     # print(f"Breathing room = {breathing_room} ({100 * np.arctan(0.12 * breathing_room):.4f})")
     # state.log("  ")
+    # AVOID UNFAVORABLE HEAD-ONS
+    
     
     return score
     
