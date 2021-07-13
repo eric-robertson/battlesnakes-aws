@@ -5,6 +5,7 @@ from Node import Node
 import Oracle
 import Packager
 import time
+import AlphaBeta
 
 MIN_SEARCH_TIME = 450 # milliseconds
 
@@ -17,6 +18,13 @@ def move ( request_data):
 
     # Construct the game board object, this is a 2D-array for storing metadata
     game_board = Packager.from_json( request_data )
+
+    strategy = "AlphaBeta"
+    if strategy == "AlphaBeta":
+        player = Packager.find_me( request_data )
+        move = AlphaBeta.decide_move(game_board, player, 2)
+        return ['left', 'right', 'up', 'down'][move]
+
     game_tree = Node( 0.5, game_board, False, 'root' )
 
     # Start tree search

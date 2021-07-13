@@ -10,7 +10,7 @@ import Snake
 import logging
 import mood
 
-log = logging.getLogger('werkzeug')
+log = logging.getLogger('hmmoro')
 log.disabled = True
 
 app = Flask(__name__)
@@ -25,7 +25,7 @@ def hello(_mood):
     # Load snake metadata
     f = open('snake_data.json')
     data = json.load( f )
-    f.close() 
+    f.close()
 
     # Return data
     print("Fielded /")

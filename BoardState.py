@@ -22,7 +22,7 @@ class BoardState:
     def isSnakeBody ( self, snake, x, y):
         return self.data[snake,x, y] > 1
     def inBounds ( self, x, y ):
-        return (x >= 0 and y >= 0 and x < self.board.shape[1] and y < self.board.shape[2])
+        return (x >= 0 and y >= 0 and x < self.data.shape[1] and y < self.data.shape[2])
     def getHealth ( self, snake ):
         return self.data[INFO_LAYER, snake, HEALTH_IDX]
     def getLength ( self, snake ):
@@ -34,7 +34,8 @@ class BoardState:
     def getHeads ( self ):
         return np.where(self.data[2:] == 1)
     def getHead ( self, snake ):
-        return np.where(self.data[2 + snake] == 1)
+        xs, ys = np.where(self.data[2 + snake] == 1)
+        return xs[0], ys[0]
     def setDead ( self, snake ):
         self.data[INFO_LAYER, 2 + snake, DEAD_IDX] = 1
     def eatFood ( self, snake ):
@@ -47,25 +48,22 @@ class BoardState:
         return np.sum(self.data[INFO_LAYER, :, DEAD_IDX])
     def numAliveSnakes(self):
         return self.totalSnakes() - self.numDeadSnakes()
-    
-    def neighbors(self, point):
-        pass # TODO
 
     # returns whether or not a point will be safe in depth game turns
-    def isSafe(self, point, depth):
-        occupant = np.max(self.data[2:, point])
+    def isSafe(self, x, y, depth):
+        occupant = np.max(self.data[2:, x, y])
         if occupant == 0:
             return True
-        snake = np.argmax(self.data[2:, point])
+        snake = np.argmax(self.data[2:, x, y])
         length = self.getLength(snake)
         return occupant + depth > length
 
 
-    def log ( self ):
-        print("Board:")
-        for j in range(self.board.shape[2]-1,-1,-1):
-            row = ""
-            for i in range (self.board.shape[1]):
+    def log ( self, indent="" ):
+        print(f"{indent}Board:")
+        for j in range(self.data.shape[2]-1,-1,-1):
+            row = indent
+            for i in range (self.data.shape[1]):
                 if self.data[2,i,j] == 1:
                     row+="A"
                 elif self.data[2,i,j] > 1:
@@ -82,12 +80,12 @@ class BoardState:
                 row += " "
 
             print(row)
-        print("Snake1: ", self.getHealth(0), 'dead' if self.getDead(0) else 'alive')
-        print("Snake2: ", self.getHealth(1), 'dead' if self.getDead(1) else 'alive')
-        print("---------------------")
+        print(f"{indent}Snake1: ", self.getHealth(0), 'dead' if self.getDead(0) else 'alive')
+        print(f"{indent}Snake2: ", self.getHealth(1), 'dead' if self.getDead(1) else 'alive')
+        print(f"{indent}---------------------")
 
     # Step forward given h1 & h2
-    def do_game_tick ( self, heads):
+    def do_game_tick ( self, heads ):
 
         # Increment each snake element
         snakes = self.data[2:]
@@ -101,17 +99,16 @@ class BoardState:
 
     # Move head
     def move_snake ( self, snake, head ):
-
         # Grab length and snake layer
         length = self.getLength( snake )
         layer = self.getLayer( snake )
         
         # Should we add another cell?
         if length != layer.max():
-            layer[ layer == layer.max() ] == 0
+            layer[ layer == layer.max() ] = 0 # == 0?
 
         # Did we hit ourself?
-        if layer[head] != 0:
+        if layer[head[0], head[1]] != 0:
             self.setDead( snake )
 
         # Set our new head
@@ -125,7 +122,7 @@ class BoardState:
 
         snakes = self.data[2:]
         # Simple check here
-        if np.any( np.multiply(snakes, axis=0) ):
+        if np.any( np.product(snakes, axis=0) ):
             # pairwise comparisons
             for s1 in range(snakes.shape[0] - 1):
                 for s2 in range(s1 + 1, snakes.shape[0]):
@@ -137,9 +134,9 @@ class BoardState:
                         h1 = self.getLength(s1)
                         h2 = self.getLength(s2)
                         if h1 >= h2:
-                            self.setDead(h2)
+                            self.setDead(s2)
                         if h2 <= h1:
-                            self.setDead(h1)
+                            self.setDead(s1)
             
         # Grab food
         for s in range(snakes.shape[0]):

@@ -9,7 +9,7 @@ def set_mood ( newMood):
 
 def score_board (board_state, snake ):
 
-    if board_state.getDead(snake): return -9999
+    if board_state.getDead(snake): return float('-inf')
 
     if mood == 'center':
         return center( board_state, snake )

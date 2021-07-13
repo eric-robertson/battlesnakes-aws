@@ -13,15 +13,15 @@ def from_json (json_blob):
     snakes = json_blob['board']['snakes']
 
     # two layers for information, the rest for snakes
-    data = np.zeros((2 + len(snakes), width, height))
+    data = np.zeros((2 + len(snakes), width, height), dtype=np.int32)
 
     # Load body into arrays
     for s,snake in enumerate(snakes):
 
         # Load body
         for i,body in enumerate(snake['body']):
-            if data[s][body['x'], body['y']] == 0:
-                data[s][body['x'], body['y']] = i+1
+            if data[2+s][body['x'], body['y']] == 0:
+                data[2+s][body['x'], body['y']] = i+1
 
         # Set health & length info
         data[INFO_LAYER, s, HEALTH_IDX] = snake['health']
@@ -33,4 +33,11 @@ def from_json (json_blob):
 
     # Construct
     return BoardState( data )
+
+def find_me(json_blob):
+    my_id = json_blob['you']['id']
+    snakes = json_blob['board']['snakes']
+    for s,snake in enumerate(snakes):
+        if snake['id'] == my_id:
+            return s
 
