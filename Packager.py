@@ -13,15 +13,15 @@ def from_json (json_blob):
     snakes = json_blob['board']['snakes']
 
     # two layers for information, the rest for snakes
-    data = np.zeros((2 + len(snakes), width, height), dtype=np.int32)
+    data = np.zeros((SNAKES_IDX + len(snakes), width, height), dtype=np.int32)
 
     # Load body into arrays
     for s,snake in enumerate(snakes):
 
         # Load body
         for i,body in enumerate(snake['body']):
-            if data[2+s][body['x'], body['y']] == 0:
-                data[2+s][body['x'], body['y']] = i+1
+            if data[SNAKES_IDX+s][body['x'], body['y']] == 0:
+                data[SNAKES_IDX+s][body['x'], body['y']] = i+1
 
         # Set health & length info
         data[INFO_LAYER, s, HEALTH_IDX] = snake['health']
@@ -30,6 +30,8 @@ def from_json (json_blob):
     # Load food
     for food in json_blob['board']['food']:
         data[FOOD_LAYER, food['x'], food['y']] = 1
+    for hazard in json_blob['board']['hazards']:
+        data[HAZARD_LAYER, hazard['x'], hazard['y']] = 1
 
     # Construct
     return BoardState( data )

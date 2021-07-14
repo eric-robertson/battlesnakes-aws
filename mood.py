@@ -162,8 +162,9 @@ def rational(state, snake):
     if num_alive > 2:
         score -= 8 * food_length
     # print(f"Breathing room = {breathing_room} ({100 * np.arctan(0.12 * breathing_room):.4f})")
-    # state.log("  ")
-    # AVOID UNFAVORABLE HEAD-ONS
+    head_x, head_y = state.getHead(snake)
+    if state.isHazard(head_x, head_y):
+        score -= 50
     
     
     return score

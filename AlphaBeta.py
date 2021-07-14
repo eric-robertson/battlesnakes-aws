@@ -1,5 +1,5 @@
 # alpha-beta pruning search
-from BoardState import BoardState
+from BoardState import *
 import numpy as np
 import mood
 from Oracle import decode
@@ -46,8 +46,8 @@ def check_for_head_on(state, player):
     opponent = get_opponent(state, player, player)
     available_moves = []
     opp_x, opp_y = state.getHead(opponent)
-    print(f"OPPONENT AT: {opp_x, opp_y}")
-    if state.getLength(opponent) >= state.getLength(player) + 1:
+    # print(f"OPPONENT AT: {opp_x, opp_y}")
+    if state.getLength(opponent) >= state.getLength(player):
         my_x, my_y = state.getHead(player)
         if abs(my_x - opp_x) + abs(my_y - opp_y) <= 2:
             for m in range(4):
@@ -113,7 +113,7 @@ def score_board ( board_state, snake, player ):
 
 def closest_snake(state, snake):
     head = state.getHead(snake)
-    snakes = state.data[2:]
+    snakes = state.data[SNAKES_IDX:]
     heads_only = 1 - np.abs(np.sign(snakes - 1))
     head_map = np.sum(heads_only, axis=0)
 

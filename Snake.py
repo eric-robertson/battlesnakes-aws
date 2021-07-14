@@ -27,7 +27,7 @@ def move ( request_data):
             max_depth = 2
         move = AlphaBeta.decide_move(game_board, player, max_depth)
         now = time.time() * 1000
-        print(f"Latency = {now - start}")
+        # print(f"Latency = {now - start}")
         return ['left', 'right', 'up', 'down'][move]
 
     game_tree = Node( 0.5, game_board, False, 'root' )
