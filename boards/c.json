@@ -1,0 +1,1 @@
+{"game":{"id":"164717","ruleset":{"name":"standard","version":"v.1.2.3"},"timeout":500},"turn":200,"you":{"health":100,"id":"you","name":"#22aa34","body":[{"x":5,"y":5}],"head":{"x":5,"y":5},"length":1},"board":{"food":[],"height":11,"width":11,"snakes":[{"health":100,"id":"you","name":"#22aa34","body":[{"x":5,"y":5}],"head":{"x":5,"y":5},"length":1}]}}
