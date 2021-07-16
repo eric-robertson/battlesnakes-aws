@@ -1,1 +1,17 @@
-{"game":{"id":"525801","ruleset":{"name":"standard","version":"v.1.2.3"},"timeout":500},"turn":200,"you":{"health":100,"id":"you","name":"#22aa34","body":[{"x":3,"y":5},{"x":2,"y":5}],"head":{"x":3,"y":5},"length":2},"board":{"food":[{"x":4,"y":5}],"height":11,"width":11,"snakes":[{"health":100,"id":"you","name":"#22aa34","body":[{"x":3,"y":5},{"x":2,"y":5}],"head":{"x":3,"y":5},"length":2},{"health":100,"id":"#FF246d","name":"#FF246d","body":[{"x":5,"y":5},{"x":6,"y":5}],"head":{"x":5,"y":5},"length":2}]}}
+{"game":{
+    "id":"525801",
+    "ruleset":{
+        "name":"standard",
+        "version":"v.1.2.3"
+    },
+    "timeout":500
+    },"turn":200,
+    
+    "you":{
+        "health":100,"id":"you","name":"#22aa34",
+        "body":[{"x":3,"y":5},{"x":3,"y":5},{"x":3,"y":5},{"x":3,"y":5}],"head":{"x":3,"y":5},"length":4},
+    "board":{
+        "food":[{"x":4,"y":5}],"height":11,"width":11,
+    "snakes":[{"health":100,
+        "id":"you","name":"#22aa34","body":[{"x":3,"y":5},{"x":3,"y":5},{"x":3,"y":5},{"x":3,"y":5}],"head":{"x":3,"y":5},"length":4},
+    {"health":100,"id":"#FF246d","name":"#FF246d","body":[{"x":5,"y":5},{"x":6,"y":5}],"head":{"x":5,"y":5},"length":2}]}}

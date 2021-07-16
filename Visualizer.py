@@ -1,6 +1,6 @@
 import Encoded
 
-def visualize_encoded ( encoding ): 
+def visualize_encoded ( encoding, score = -1 ): 
 
     size = Encoded.get_size( encoding )
     foods = Encoded.get_food( encoding )
@@ -33,10 +33,15 @@ def visualize_encoded ( encoding ):
 
         print(' '.join(row))
 
+    if score != -1:
+        print("SCORED: " + str(score))
+
     for s in range(snakes):
         health = Encoded.get_health( s, encoding )
-        length = Encoded.get_length( s, encoding )
+        length = Encoded.get_realizedLength( s, encoding )
         dead = Encoded.get_snake( s, encoding )[0,0] != 0
+        grow = Encoded.get_realizedLength(s, encoding) != Encoded.get_length(s,encoding)
 
-        print(f"{snake_codes[s]}: {health} HP, {length} Len" + (", DEAD" if dead else ""))
+        print(f"{snake_codes[s]}: {health} HP, {length} Len" + (", DEAD" if dead else ""), "+" if grow else "")
+
     print('----------------------')

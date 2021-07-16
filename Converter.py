@@ -36,7 +36,7 @@ def _create_snake ( snake, id, board ):
         pos = body['x'] + 1, body['y'] + 1 
         if board[ 2+id, pos[0], pos[1] ] == 0:
             realized_length += 1
-        board[ 2+id, pos[0], pos[1] ] = length - i
+            board[ 2+id, pos[0], pos[1] ] = length - i
 
 
     board[ 1, id, 0 ] = head[0]
