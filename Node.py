@@ -69,4 +69,4 @@ class Node:
                         Tree.insert_branch( s.snakes, s.boardstate, s)
 
     def report ( self ):
-        return self.result
+        return self.result, self.transient_score, self.base_score
