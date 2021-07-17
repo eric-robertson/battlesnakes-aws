@@ -18,7 +18,6 @@ class Node:
     # Computes the score for a given node after its children have been filled in
     def recompute ( self, rec = False) :
         
-
         future_size = (4 ** (self.snakes - 1))
         branch_scores = []
         best_move = 0
@@ -40,6 +39,8 @@ class Node:
                 if s.transient_score == np.inf:
                     winning += 1
 
+            if worst > 0 and worst < np.inf:
+                worst += 200 * winning
             branch_scores.append((worst, winning))
 
             # If the worst result from this move is better than any other
