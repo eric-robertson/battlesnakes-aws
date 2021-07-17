@@ -7,6 +7,7 @@ import numpy as np
 # (s+2, w+2, w+2)
 def json_to_board (json_blob):
 
+    you = json_blob['you']
     json_blob = json_blob['board']
 
     snakes = json_blob['snakes']
@@ -17,7 +18,14 @@ def json_to_board (json_blob):
 
     # Encode everything in better representations
     _create_foods( foods, raw_board)
-    for i,s in enumerate(snakes): 
+
+    # order snakes
+    new_snakes = [ you ]
+    for s in snakes:
+        if s['id'] != new_snakes[0]['id']:
+            new_snakes.append( s )
+
+    for i,s in enumerate(new_snakes): 
         _create_snake( s, i, raw_board )
 
     return raw_board
