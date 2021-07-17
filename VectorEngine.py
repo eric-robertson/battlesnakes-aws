@@ -223,7 +223,6 @@ def score_boards ( futures, base_snakes ):
 
     head_distance = np.sum(np.abs(_your_head - _their_head), axis=1)
     score += 1000 / (head_distance + 0.5) 
-
     
     multiplier = _your_alive * (_your_health != 0)
     final = multiplier * score 
