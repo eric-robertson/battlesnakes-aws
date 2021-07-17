@@ -1,5 +1,5 @@
 import numpy as np
-import Tree, Visualizer
+from . import Tree, Visualizer
 
 class Node:
 
