@@ -4,6 +4,7 @@ import json
 import numpy as np
 
 # Create a board from a json blob of a given board
+# (s+2, w+2, w+2)
 def json_to_board (json_blob):
 
     json_blob = json_blob['board']

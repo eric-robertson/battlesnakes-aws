@@ -1,46 +1,53 @@
 from Visualizer import visualize_encoded
 import numpy as np
-import VectorEngine
+import VectorEngine, Visualizer
 from Node import Node
 import time
 
+# Caching
+skiptree_lookups = {}
+
 # The tree itself!
-branches = [[]] * 4
-parents = [[]] * 4
+branches = [None,None,[],[],[]]
+parents = [None,None,[],[],[]]
+
+base_snakes = 0
 
 def register_root ( board_state ):
-    snakes = board_state.shape[0] - 2
-    root = Node( None, board_state, 1, snakes )
+    global base_snakes
+    base_snakes = board_state.shape[0] - 2
+    root = Node( None, board_state, 1, base_snakes )
 
-    branches[snakes].append(board_state)
-    parents[snakes].append(root)
+    branches[base_snakes].append(board_state)
+    parents[base_snakes].append(root)
 
     return root
-
 
 def register_branch ( node, move_id, board_state, score, snakes ):
 
     new_node = Node( node, board_state, score, snakes )
     node.register_child( move_id, new_node )
 
-    if ( score > 0 and snakes > 1):
-        branches[snakes].append( board_state )
-        parents[snakes].append( new_node )
+def insert_branch ( snakes, state, node ):
+    if snakes < 2: return
+    branches[snakes].append( state )
+    parents[snakes].append( node )
 
-def compute_branches ( snakes ):
+def compute_branches ( snakes, items = 100 ):
     
     global parents
     
-    items = len(branches[snakes]) 
-    parent_nodes = parents[snakes]
-    states = np.stack( branches[snakes] )
+    items = min(items, len(parents[snakes]))
 
-    branches[snakes].clear()
+    parent_nodes = parents[snakes][:items]
+    states = np.stack( branches[snakes][:items] )
+
+    branches[snakes] = branches[snakes][items:]
 
     # Batching baby!
     start = time.time()
     futures = VectorEngine.step_snakes( states )
-    scores = VectorEngine.score_boards( futures )
+    scores = VectorEngine.score_boards( futures, base_snakes )
     t1 = time.time()
 
     # future ids
@@ -73,5 +80,5 @@ def compute_branches ( snakes ):
     t2 = time.time()
 
     print(f"Expanded {items} boards into {future_counts*items} total states each in {round((t1-start),5)}s and inserted into tree in {round((t2-t1),5)}s ")
-
+    print("Buckets are now: ", ', '.join([ f"{i}: {len(b) if b != None else 'x'}" for i,b in enumerate(branches) ]))
 
