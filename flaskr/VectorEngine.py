@@ -1,5 +1,4 @@
 import numpy as np
-import Encoded
 
 def compute_head_offsets ( snakes ):    
     

@@ -1,4 +1,4 @@
-from . import Snake, Clippers, mood
+from . import Snake
 
 from flask import Flask, request
 

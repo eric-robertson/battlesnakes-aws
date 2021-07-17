@@ -1,4 +1,4 @@
-import Encoded
+from . import Encoded
 
 def visualize_encoded ( encoding, score = -1 ): 
 

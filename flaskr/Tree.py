@@ -1,7 +1,7 @@
-from Visualizer import visualize_encoded
+from .Visualizer import visualize_encoded
 import numpy as np
-import VectorEngine, Visualizer
-from Node import Node
+from . import VectorEngine, Visualizer
+from .Node import Node
 import time
 
 # Caching
