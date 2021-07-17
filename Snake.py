@@ -3,7 +3,7 @@ import Converter, Node, Tree
 import numpy as np
 import time
 
-MIN_SEARCH_TIME = 430 # milliseconds
+MIN_SEARCH_TIME = 330 # milliseconds
 
 def start ( request_data ):
     return ""

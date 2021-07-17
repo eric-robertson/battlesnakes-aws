@@ -34,6 +34,9 @@ class Node:
                 s = self.futures[index]
                 if ( s == None ): continue
                 
+                print("Move", m)
+                Visualizer.visualize_encoded( s.boardstate, s.transient_score )
+
                 if s.transient_score < worst:
                     worst = s.transient_score
                 if s.transient_score == np.inf:

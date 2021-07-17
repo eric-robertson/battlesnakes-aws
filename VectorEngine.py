@@ -143,15 +143,18 @@ def step_snakes ( to_compute ):
     snake_slices = _ws[ i, 2:, _new_heads[:,0], _new_heads[:,1] ]
 
     # Compute what snakes are fighting over a given square!
-    top_snakes = np.argsort(-snake_slices, axis=1)
-    not_top_snake = s != top_snakes[:,0]
+    #top_snakes = np.argsort(-snake_slices, axis=1)
+    #is_top_snake = s == top_snakes[:,0]
+    no_other_snake = snake_slices[s].sum(axis=1) == snake_slices.sum(axis=1)
+
+    died_to_collision = np.logical_not(no_other_snake)#top_snakes.sum(axis=1) == s
     
-    top_weight = snake_slices[np.arange(size),top_snakes[:,0]]
-    seccond_weight = snake_slices[np.arange(size),top_snakes[:,1]]
-    tied_for_top = top_weight == seccond_weight
+    #top_weight = snake_slices[np.arange(size),top_snakes[:,0]]
+    #seccond_weight = snake_slices[np.arange(size),top_snakes[:,1]]
+    #tied_for_top = top_weight == seccond_weight
     
     # What snakes are dieing to collisions
-    died_to_collision = np.logical_or(not_top_snake, tied_for_top)
+    #died_to_collision = np.logical_or(not_top_snake, tied_for_top)
     
     # BOARD CHANGE -> KILL snakes that died to collisions
     _ws_layers[died_to_collision,0,0] = 1
