@@ -145,9 +145,9 @@ def step_snakes ( to_compute ):
     # Compute what snakes are fighting over a given square!
     #top_snakes = np.argsort(-snake_slices, axis=1)
     #is_top_snake = s == top_snakes[:,0]
-    no_other_snake = snake_slices[s].sum(axis=1) == snake_slices.sum(axis=1)
+    died_to_collision = snake_slices[np.arange(size), s] != snake_slices.sum(axis=1)
 
-    died_to_collision = np.logical_not(no_other_snake)#top_snakes.sum(axis=1) == s
+    #died_to_collision = np.logical_not(no_other_snake)#top_snakes.sum(axis=1) == s
     
     #top_weight = snake_slices[np.arange(size),top_snakes[:,0]]
     #seccond_weight = snake_slices[np.arange(size),top_snakes[:,1]]

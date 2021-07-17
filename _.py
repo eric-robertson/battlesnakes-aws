@@ -1,7 +1,7 @@
 import json, time
 import Converter, Encoded, Visualizer, Tree
 
-file = open('./boards/i.json')
+file = open('./boards/j.json')
 data = json.load( file )
 file.close() 
 
@@ -18,6 +18,7 @@ start = time.time() * 1000
 while True:
 
     Tree.compute_branches( 2 )
+    break
     
     now = time.time() * 1000
     if ( now - start > 300 ): break

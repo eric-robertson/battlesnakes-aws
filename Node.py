@@ -17,6 +17,8 @@ class Node:
 
     # Computes the score for a given node after its children have been filled in
     def recompute ( self, rec = False) :
+        
+        Visualizer.visualize_encoded( self.futures[14].boardstate, self.futures[14].base_score)
 
         future_size = (4 ** (self.snakes - 1))
         branch_scores = []
@@ -33,6 +35,7 @@ class Node:
                 index = m + (f*4)
                 s = self.futures[index]
                 if ( s == None ): continue
+
 
                 if s.transient_score < worst:
                     worst = s.transient_score
