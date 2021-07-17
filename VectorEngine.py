@@ -210,7 +210,7 @@ def score_boards ( futures, base_snakes ):
     _all_dead = np.all(futures[:,3:,0,0] != 0, axis = 1)
     
     score = np.zeros((f * s[1]), dtype='f')
-    score += futures[:,1,0,2] * 20
+    score += _your_length * 2000
     score += _your_health 
     
     score += _dead_count * 1000
