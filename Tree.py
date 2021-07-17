@@ -15,6 +15,12 @@ base_snakes = 0
 
 def register_root ( board_state ):
     global base_snakes
+    global branches
+    global parents
+    
+    branches = [None,None,[],[],[]]
+    parents = [None,None,[],[],[]]
+    
     base_snakes = board_state.shape[0] - 2
     root = Node.Node( None, board_state, 1, base_snakes )
 
