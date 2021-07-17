@@ -28,7 +28,7 @@ def move ( request_data):
         
     # Finished, lets get our best board
     move, transient, _ = root.report()
-    move_name = ['left', 'right', 'up', 'down'][move]
+    move_name = ['left', 'right', 'down', 'up'][move]
 
     print(move_name, 'predicting a score of:', transient)
 

@@ -1,7 +1,7 @@
 import json, time
 import Converter, Encoded, Visualizer, Tree
 
-file = open('./boards/j.json')
+file = open('./boards/k.json')
 data = json.load( file )
 file.close() 
 
@@ -25,6 +25,4 @@ while True:
 
 # Result?
 
-move,score,_ = root.report()
-move_name = ['left', 'right', 'up', 'down'][move]
-print(move_name, score)
+root.report_detail()

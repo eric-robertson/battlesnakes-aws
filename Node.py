@@ -17,6 +17,7 @@ class Node:
 
     # Computes the score for a given node after its children have been filled in
     def recompute ( self, rec = False) :
+        
 
         future_size = (4 ** (self.snakes - 1))
         branch_scores = []
@@ -33,7 +34,6 @@ class Node:
                 index = m + (f*4)
                 s = self.futures[index]
                 if ( s == None ): continue
-
 
                 if s.transient_score < worst:
                     worst = s.transient_score
@@ -71,3 +71,44 @@ class Node:
 
     def report ( self ):
         return self.result, self.transient_score, self.base_score
+
+    def report_detail ( self ):
+
+        future_size = (4 ** (self.snakes - 1))
+        branch_scores = []
+        best_move = 0
+        best_move_id = 0
+
+        # Check each move
+        for m in range(4):
+
+            print("\n\nEXPLORING: ", ['left', 'right', 'down', 'up'][m] )
+
+            worst = np.inf
+            winning = 0
+
+            for f in range(future_size):
+                index = m + (f*4)
+                s = self.futures[index]
+                if ( s == None ): continue
+
+                Visualizer.visualize_encoded( self.futures[index].boardstate, self.futures[index].base_score)
+
+                if s.transient_score < worst:
+                    worst = s.transient_score
+                if s.transient_score == np.inf:
+                    winning += 1
+
+            print("OUTCOME: ", worst)
+            branch_scores.append((worst, winning))
+
+            # If the worst result from this move is better than any other
+            # Set it to be the next best move
+            if worst > best_move:
+                best_move = worst
+                best_move_id = m
+
+        # Register best resultant move
+        self.result = best_move_id
+
+        print("Best option is: ", ['left', 'right', 'up', 'down'][best_move_id])
