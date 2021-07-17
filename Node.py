@@ -52,7 +52,7 @@ class Node:
 
         # Now, did we update are score? Should we recurse?
         if ( self.transient_score != best_move):
-            self.transient_score = best_move
+            self.transient_score = best_move + 1
             if ( self.parent != None ):
                 self.parent.recompute( rec=True )
 
