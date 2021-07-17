@@ -1,7 +1,7 @@
 import json, time
 import Converter, Encoded, Visualizer, Tree
 
-file = open('./boards/h.json')
+file = open('./boards/i.json')
 data = json.load( file )
 file.close() 
 

@@ -1,4 +1,4 @@
-import Converter, Node, Tree
+import Converter, Node, Tree, Visualizer
 
 import numpy as np
 import time
@@ -16,6 +16,8 @@ def move ( request_data):
     game_board = Converter.json_to_board( request_data )
     root = Tree.register_root(game_board)
 
+    Visualizer.visualize_encoded( game_board )
+    
     # Start tree search
     while True:
 
