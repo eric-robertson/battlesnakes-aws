@@ -205,6 +205,7 @@ def score_boards ( futures, base_snakes ):
     _your_length = futures[:,1,0,3]
     _max_length = futures[:,1,:,3].max(axis=1)
     _your_head = futures[:,1,0,:2]
+    _their_head = futures[:,1,1,:2]
     _dead_count = base_snakes - (1*(futures[:,2:,0,0] == 0)).sum(axis = 1)
     _all_dead = np.all(futures[:,3:,0,0] != 0, axis = 1)
     
@@ -219,6 +220,10 @@ def score_boards ( futures, base_snakes ):
     
     supremacy = (_your_length - _max_length) > 0
     score += supremacy * 100
+
+    head_distance = np.sum(np.abs(_your_head - _their_head), axis=1)
+    score += 1000 / (head_distance + 0.5) 
+
     
     multiplier = _your_alive * (_your_health != 0)
     final = multiplier * score 
