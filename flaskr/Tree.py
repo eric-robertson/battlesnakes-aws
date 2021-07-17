@@ -1,7 +1,7 @@
 from .Visualizer import visualize_encoded
 import numpy as np
 from . import VectorEngine, Visualizer
-from .Node import Node
+from . import Node
 import time
 
 # Caching
@@ -22,7 +22,7 @@ def register_root ( board_state ):
     parents = [None,None,[],[],[]]
 
     base_snakes = board_state.shape[0] - 2
-    root = Node( None, board_state, 1, base_snakes )
+    root = Node.Node( None, board_state, 1, base_snakes )
 
     branches[base_snakes].append(board_state)
     parents[base_snakes].append(root)
@@ -31,7 +31,7 @@ def register_root ( board_state ):
 
 def register_branch ( node, move_id, board_state, score, snakes ):
 
-    new_node = Node( node, board_state, score, snakes )
+    new_node = Node.Node( node, board_state, score, snakes )
     node.register_child( move_id, new_node )
 
 def insert_branch ( snakes, state, node ):
