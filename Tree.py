@@ -38,6 +38,7 @@ def compute_branches ( snakes, items = 100 ):
     global parents
     
     items = min(items, len(parents[snakes]))
+    if items == 0: return
 
     parent_nodes = parents[snakes][:items]
     states = np.stack( branches[snakes][:items] )
