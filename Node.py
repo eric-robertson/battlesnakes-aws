@@ -17,8 +17,6 @@ class Node:
 
     # Computes the score for a given node after its children have been filled in
     def recompute ( self, rec = False) :
-        
-        Visualizer.visualize_encoded( self.futures[14].boardstate, self.futures[14].base_score)
 
         future_size = (4 ** (self.snakes - 1))
         branch_scores = []
