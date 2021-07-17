@@ -73,7 +73,6 @@ def create_app(test_config=None):
         # print(data) # for testing
 
         # Trigger handler
-        mood.set_mood(_mood)
         move_response = Snake.move( data )
 
         # Return data
