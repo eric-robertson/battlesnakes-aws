@@ -3,7 +3,7 @@ import Converter, Node, Tree
 import numpy as np
 import time
 
-MIN_SEARCH_TIME = 330 # milliseconds
+MIN_SEARCH_TIME = 300 # milliseconds
 
 def start ( request_data ):
     return ""
@@ -28,6 +28,6 @@ def move ( request_data):
     move, transient, _ = root.report()
     move_name = ['left', 'right', 'up', 'down'][move]
 
-    print(move_name, 'predicting score', transient)
+    print(move_name, 'predicting a score of:', transient)
 
     return move_name

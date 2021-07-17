@@ -80,5 +80,3 @@ def compute_branches ( snakes, items = 100 ):
     t2 = time.time()
 
     print(f"Expanded {items} boards into {future_counts*items} total states each in {round((t1-start),5)}s and inserted into tree in {round((t2-t1),5)}s ")
-    print("Buckets are now: ", ', '.join([ f"{i}: {len(b) if b != None else 'x'}" for i,b in enumerate(branches) ]))
-
