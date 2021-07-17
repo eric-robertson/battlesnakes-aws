@@ -50,6 +50,7 @@ class Node:
                 best_move_id = m
 
         # Register best resultant move
+        
         self.result = best_move_id
 
         # Now, did we update are score? Should we recurse?
